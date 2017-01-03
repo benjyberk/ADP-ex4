@@ -8,6 +8,7 @@
 #include "Serializer.h"
 #include "StandardTaxi.h"
 #include "LuxuryTaxi.h"
+#include "GameControl.h"
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/archive/binary_oarchive.hpp>
@@ -16,22 +17,27 @@ using namespace std;
 
 void client::run() {
     vector<string> tokens;
-
+    GameControl gc;
     int id, age, experience, vehicleID;
     MaritalStatus mStatus;
+    string input;
 
+    getline(cin, input);
     // Tokenize the input
-    tokens = tokenizeByChar(input, ',');
+    tokens = gc.tokenizeByChar(input, ',');
 
     id = atoi(tokens[0].c_str());
     age = atoi(tokens[1].c_str());
-    mStatus = (MaritalStatus) enumFromString(tokens[2], 'M');
+    mStatus = (MaritalStatus) gc.enumFromString(tokens[2], 'M');
     experience = atoi(tokens[3].c_str());
     vehicleID = atoi(tokens[4].c_str());
 
     // Generate the driver and add it to the dispatcher
     Driver * d = new Driver(id, age, mStatus, experience, vehicleID);
 
+
+
+    delete d;
 }
 
 /*Driver d(1,1,SINGLE,1,1);

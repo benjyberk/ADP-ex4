@@ -20,12 +20,12 @@ private:
     std::vector<Point> obstacles;
     GridMap * gridmap;
     TaxiDispatch * dispatcher;
-    // Tokenizes a string and returns the vector
-    std::vector<std::string> tokenizeByChar(std::string, char);
-    // Converts the input string into the enumeration based on type
-    int enumFromString(std::string raw, char type);
     Clock clock;
 public:
+    // Converts the input string into the enumeration based on type
+    int enumFromString(std::string raw, char type);
+    // Tokenizes a string and returns the vector
+    std::vector<std::string> tokenizeByChar(std::string, char);
     GameControl();
     // Parses a driver from input and adds it to the Taxi Dispatcher
     void addDriver(std::string);
