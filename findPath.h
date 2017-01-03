@@ -14,7 +14,7 @@
  * The bfsLogic class, given a generic gridmap, maps out a route from a destination to the end
  * point.  Note, that any type of GridMap would work, as generic operators are used to find
  * the neighbours of any given point.  However the GridMap MUST be comprised of gridsquare (or
- * any inheritor that also contains the necessary fields).
+ * any inheritor that also contains the necessary fields).LL
  */
 class findPath {
 public:
