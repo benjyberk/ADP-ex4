@@ -15,6 +15,45 @@
 using namespace std;
 
 void client::run() {
+    vector<string> tokens;
+
+    int id, age, experience, vehicleID;
+    MaritalStatus mStatus;
+
+    // Tokenize the input
+    tokens = tokenizeByChar(input, ',');
+
+    id = atoi(tokens[0].c_str());
+    age = atoi(tokens[1].c_str());
+    mStatus = (MaritalStatus) enumFromString(tokens[2], 'M');
+    experience = atoi(tokens[3].c_str());
+    vehicleID = atoi(tokens[4].c_str());
+
+    // Generate the driver and add it to the dispatcher
+    Driver * d = new Driver(id, age, mStatus, experience, vehicleID);
+
+}
+
+/*Driver d(1,1,SINGLE,1,1);
+string serial;
+boost::iostreams::back_insert_device<std::string> inserter(serial);
+boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
+boost::archive::binary_oarchive oa(s);
+oa << d;
+s.flush();
+
+cout << serial << endl;
+Driver *d2;
+size_t len = serial.size();
+char * begin = (char *)serial.c_str();
+char * end = begin + serial.size();
+boost::iostreams::basic_array_source<char> device(begin, end);
+boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
+boost::archive::binary_iarchive ia(s2);
+ia >> d2;*/
+
+/*
+ *
     Serializer serial;
     string returnString;
     findPath find;
@@ -57,22 +96,5 @@ void client::run() {
         cout << rti->getRoute()->at(i).toString();
     }
     cout << endl;
-}
 
-/*Driver d(1,1,SINGLE,1,1);
-string serial;
-boost::iostreams::back_insert_device<std::string> inserter(serial);
-boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
-boost::archive::binary_oarchive oa(s);
-oa << d;
-s.flush();
-
-cout << serial << endl;
-Driver *d2;
-size_t len = serial.size();
-char * begin = (char *)serial.c_str();
-char * end = begin + serial.size();
-boost::iostreams::basic_array_source<char> device(begin, end);
-boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
-boost::archive::binary_iarchive ia(s2);
-ia >> d2;*/
+ */
