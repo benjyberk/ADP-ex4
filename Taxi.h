@@ -29,6 +29,7 @@ protected:
     Passenger* passengers;
     Point* location;
     int tariff;
+    int upto;
     TripInfo currentTrip;
 public:
     Taxi(int, CarMaker, Color);

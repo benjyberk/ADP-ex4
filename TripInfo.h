@@ -8,6 +8,7 @@
 
 
 #include <stack>
+#include <vector>
 #include "Point.h"
 
 class TripInfo {
@@ -19,15 +20,17 @@ private:
     int tarrif;
     int numPassengers;
     int startTime;
-    std::stack<Point>* route;
+    std::vector<Point>* route;
 public:
     TripInfo(int, Point, Point, int, int, int);
     TripInfo();
     int getStartTime();
     void updateMeter(int);
     void changeEndPoint(Point);
-    void assignRoute(std::stack<Point>*);
-    std::stack<Point>* getRoute();
+    int getNumPassengers();
+    int getTarrif();
+    void assignRoute(std::vector<Point>*);
+    std::vector<Point>* getRoute();
     int getRideID();
     int getCurrentDistance();
     Point getStartPoint();

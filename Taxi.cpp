@@ -30,7 +30,7 @@ int Taxi::getID() {
 }
 
 int Taxi::getPrice() {
-    return 0;
+    return tariff;
 }
 
 Passenger *Taxi::getPassenger() {
@@ -59,5 +59,6 @@ void Taxi::setDriver(Driver * newDriver) {
 
 void Taxi::assignTrip(TripInfo assign) {
     currentTrip = assign;
+    upto = assign.getRoute()->size() - 1;
     isAssigned = true;
 }

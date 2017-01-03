@@ -50,15 +50,23 @@ Point TripInfo::getEndPoint() {
     return endPoint;
 }
 
-void TripInfo::assignRoute(std::stack<Point>* assignedRoute) {
+void TripInfo::assignRoute(std::vector<Point>* assignedRoute) {
     route = assignedRoute;
 }
 
-std::stack<Point>* TripInfo::getRoute() {
+std::vector<Point>* TripInfo::getRoute() {
     return route;
 }
 
 int TripInfo::getStartTime() {
     return startTime;
+}
+
+int TripInfo::getNumPassengers() {
+    return numPassengers;
+}
+
+int TripInfo::getTarrif() {
+    return tarrif;
 }
 

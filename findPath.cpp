@@ -6,7 +6,7 @@
 #include "findPath.h"
 using namespace std;
 
-stack<Point>* findPath::bfsRoute(GridMap* search, Point source, Point destination) {
+vector<Point>* findPath::bfsRoute(GridMap* search, Point source, Point destination) {
     queue<GraphSquare*> nodes;
     GraphSquare* check;
     vector<GraphSquare *> adjacent;
@@ -47,13 +47,13 @@ stack<Point>* findPath::bfsRoute(GridMap* search, Point source, Point destinatio
 
     // We now transverse from the destination to the source, the print-out is in reverse order
     // so we use a stack (FILO).
-    stack<Point> * reverseOrder = new stack<Point>;
+    vector<Point> * reverseOrder = new vector<Point>;
     check = search->getNode(destination);
     found = false;
     // We follow the trail back from the source to the destination using the 'predecessor' member.
     while (!found) {
         Point* current = check->gridLocation;
-        reverseOrder->push(*current);
+        reverseOrder->emplace_back(*current);
         if (*current == source) {
             found = true;
         }

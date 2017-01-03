@@ -57,12 +57,11 @@ void TaxiDispatch::addDriver(Driver * newDriver) {
     Point * start = database[newDriver->getID()]->location;
     DriverLocationListener * l = new DriverLocationListener(start, newDriver->getID());
     listeners.push_back(l);
-    newDriver->addListener(l);
     database[newDriver->getID()]->setDriver(newDriver);
 }
 
 void TaxiDispatch::addTrip(TripInfo * newTrip) {
-    stack<Point> * r = router.bfsRoute(gridMap, newTrip->getStartPoint(), newTrip->getEndPoint());
+    vector<Point> * r = router.bfsRoute(gridMap, newTrip->getStartPoint(), newTrip->getEndPoint());
 
     newTrip->assignRoute(r);
     // We add the trip to the list of trips

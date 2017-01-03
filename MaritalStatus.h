@@ -6,11 +6,12 @@
 #ifndef ADVANCED_EX2_MARITALSTATUS_H
 #define ADVANCED_EX2_MARITALSTATUS_H
 
-enum MaritalStatus {
-    SINGLE,
-    MARRIED,
-    DIVORCED,
-    WIDOWED,
-};
+    enum MaritalStatus {
+        SINGLE,
+        MARRIED,
+        DIVORCED,
+        WIDOWED,
+    };
+
 
 #endif //ADVANCED_EX2_MARITALSTATUS_H

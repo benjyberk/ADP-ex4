@@ -8,10 +8,13 @@
 #include "Point.h"
 #include "GridMap.h"
 #include "GameControl.h"
+#include "client.h"
 
 using namespace std;
 
 int main() {
+    client c;
+    c.run();
     string lineInput;
     int getChoice;
     char dummy;

@@ -15,6 +15,7 @@ class DriverLocationListener;
 #include "Taxi.h"
 #include "DriverLocationListener.h"
 #include "TripInfo.h"
+#include <boost/serialization/access.hpp>
 
 /**
  * The driver is essentially a container class for information. His only (cureent)
@@ -29,20 +30,29 @@ private:
     int averageSatisfaction;
     int passengers;
     int carID;
-    Taxi* taxi;
-    std::vector<DriverLocationListener *> observers;
+
+    friend class boost::serialization::access;
+
+    template<class Archive>
+    void serialize(Archive &ar, const unsigned int version)
+    {
+        ar & id;
+        ar & age;
+        ar & yearsExperience;
+        ar & averageSatisfaction;
+        ar & passengers;
+        ar & carID;
+    }
 public:
     Driver(int, int, MaritalStatus, int, int);
+    Driver(int, int, int, int);
+    Driver();
     int getID();
     int getAge();
     MaritalStatus getMarital();
-    Taxi* getTaxi();
+    int getTaxi();
     int getSatisfaction();
     int getYears();
-    void setTaxi(Taxi*);
-    void notifyListeners();
-    // Add a listener for the driver position
-    void addListener(DriverLocationListener *);
 };
 
 

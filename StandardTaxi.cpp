@@ -9,20 +9,20 @@ using namespace std;
 
 StandardTaxi::StandardTaxi(int id, CarMaker manu, Color color) : Taxi(
         id, manu, color) {
-
+    tariff = 1;
 }
 
 int StandardTaxi::move() {
     if (isAssigned) {
-        location->x = currentTrip.getRoute()->top().x;
-        location->y = currentTrip.getRoute()->top().y;
+        location->x = (currentTrip.getRoute())->at(upto).x;
+        location->y = (currentTrip.getRoute())->at(upto).y;
         cout << "New pos: " << location->toString() << endl;
-        currentTrip.getRoute()->pop();
-        if (currentTrip.getRoute()->empty()) {
+        upto--;
+        if (upto < 0) {
             isAssigned = false;
         }
         // Returns 0 if there are no more moves to perform, otherwise 1.
-        return !currentTrip.getRoute()->empty();
+        return upto >= 0;
     }
     return 0;
 }

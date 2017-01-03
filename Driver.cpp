@@ -17,6 +17,14 @@ Driver::Driver(int n_id, int n_age, MaritalStatus n_mStatus, int n_experience, i
     carID = n_vehicleID;
 }
 
+Driver::Driver() {
+    id = 0;
+    age = 0;
+    maritalStatus = SINGLE;
+    yearsExperience = 0;
+    carID = 0;
+}
+
 int Driver::getID() {
     return id;
 }
@@ -26,31 +34,25 @@ int Driver::getAge() {
 }
 
 MaritalStatus Driver::getMarital() {
-    return SINGLE;
+    return maritalStatus;
 }
 
-Taxi* Driver::getTaxi() {
-    return 0;
+int Driver::getTaxi() {
+    return carID;
 }
 
 int Driver::getYears() {
-    return 0;
-}
-
-void Driver::setTaxi(Taxi*) {
-
-}
-
-
-
-void Driver::notifyListeners() {
-
+    return yearsExperience;
 }
 
 int Driver::getSatisfaction() {
     return 0;
 }
 
-void Driver::addListener(DriverLocationListener * listener) {
-    observers.push_back(listener);
+Driver::Driver(int n_id, int n_age, int n_experience, int n_vehicleID) {
+    id = n_id;
+    age = n_age;
+    maritalStatus = SINGLE;
+    yearsExperience = n_experience;
+    carID = n_vehicleID;
 }

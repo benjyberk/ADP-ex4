@@ -25,7 +25,7 @@ public:
      * @param source the source point
      * @param destination the destination point
      */
-    std::stack<Point>* bfsRoute(GridMap* search, Point source, Point destination);
+    std::vector<Point>* bfsRoute(GridMap* search, Point source, Point destination);
 };
 
 
