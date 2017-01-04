@@ -27,8 +27,9 @@ Driver *Serializer::deserializeDriver(std::string input) {
 
 std::string Serializer::serializeTaxi(Taxi * t) {
     ostringstream buildString;
+    string location = serializePoint(*t->getLocation());
     buildString << t->getPrice() << ';' << t->getID() << ';'
-                << (int)t->getManufacturer() << ';' << (int)t->getColor();
+                << (int)t->getManufacturer() << ';' << (int)t->getColor() << ';' << location;
     return buildString.str();
 }
 
@@ -36,14 +37,16 @@ Taxi *Serializer::deserializeTaxi(std::string input) {
     int type, id, manu, color;
     char dummy;
     Taxi * returnObj;
+    Point * location = new Point();
     istringstream parser(input);
-    parser >> type >> dummy >> id >> dummy >> manu >> dummy >> color;
+    parser >> type >> dummy >> id >> dummy >> manu >> dummy >> color >> dummy >> location->x >>
+            dummy >> location->y;
     if (type == 1) {
         returnObj = new StandardTaxi(id, (CarMaker)manu, (Color)color);
     } else {
         returnObj = new LuxuryTaxi(id, (CarMaker)manu, (Color)color);
     }
-
+    returnObj->setLocation(location);
     return returnObj;
 }
 

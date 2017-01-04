@@ -9,7 +9,7 @@
 
 class client {
 public:
-    static void run();
+    static int main(int, char);
 };
 
 

@@ -62,3 +62,7 @@ void Taxi::assignTrip(TripInfo assign) {
     upto = assign.getRoute()->size() - 1;
     isAssigned = true;
 }
+
+Point * Taxi::getLocation() {
+    return location;
+}

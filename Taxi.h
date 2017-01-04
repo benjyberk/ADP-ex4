@@ -39,6 +39,7 @@ public:
     int getID();
     int getPrice();
     Passenger* getPassenger();
+    Point * getLocation();
     void setPassenger(Passenger);
     void setLocation(Point *);
     virtual int move() = 0;

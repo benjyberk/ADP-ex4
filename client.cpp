@@ -9,20 +9,25 @@
 #include "StandardTaxi.h"
 #include "LuxuryTaxi.h"
 #include "GameControl.h"
-#include <boost/iostreams/device/back_inserter.hpp>
-#include <boost/iostreams/stream.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
+#include "Socket.h"
+#include "Udp.h"
+
 using namespace std;
 
-void client::run() {
+int main(int argc, char* argv[]) {
     vector<string> tokens;
     GameControl gc;
     int id, age, experience, vehicleID;
     MaritalStatus mStatus;
-    string input;
+    string input, send, receive;
+    Serializer serial;
+    Taxi * taxi;
+    TripInfo * trip;
+    char buffer[2048];
 
+    // Get program input (a single driver)
     getline(cin, input);
+
     // Tokenize the input
     tokens = gc.tokenizeByChar(input, ',');
 
@@ -32,10 +37,21 @@ void client::run() {
     experience = atoi(tokens[3].c_str());
     vehicleID = atoi(tokens[4].c_str());
 
-    // Generate the driver and add it to the dispatcher
+    // Generate the driver object
     Driver * d = new Driver(id, age, mStatus, experience, vehicleID);
 
+    // Serialize the driver
+    send = serial.serializeDriver(d);
 
+    Socket * udp = new Udp(0, atoi(argv[2]), argv[1]);
+    udp->initialize();
+    udp->sendData(send);
+    udp->reciveData(buffer, sizeof(buffer));
+    receive = string(buffer);
+    taxi = serial.deserializeTaxi(receive);
+    udp->reciveData(buffer, sizeof(buffer));
+    receive = string(buffer);
+    trip = serial.deserializeTrip(receive);
 
     delete d;
 }
