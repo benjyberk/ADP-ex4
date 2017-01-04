@@ -34,6 +34,7 @@ std::string Serializer::serializeTaxi(Taxi * t) {
 }
 
 Taxi *Serializer::deserializeTaxi(std::string input) {
+    cout << "starting" << endl;
     int type, id, manu, color;
     char dummy;
     Taxi * returnObj;

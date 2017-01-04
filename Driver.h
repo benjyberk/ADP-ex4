@@ -15,7 +15,6 @@ class DriverLocationListener;
 #include "Taxi.h"
 #include "DriverLocationListener.h"
 #include "TripInfo.h"
-#include <boost/serialization/access.hpp>
 
 /**
  * The driver is essentially a container class for information. His only (cureent)
@@ -30,19 +29,6 @@ private:
     int averageSatisfaction;
     int passengers;
     int carID;
-
-    friend class boost::serialization::access;
-
-    template<class Archive>
-    void serialize(Archive &ar, const unsigned int version)
-    {
-        ar & id;
-        ar & age;
-        ar & yearsExperience;
-        ar & averageSatisfaction;
-        ar & passengers;
-        ar & carID;
-    }
 public:
     Driver(int, int, MaritalStatus, int, int);
     Driver(int, int, int, int);

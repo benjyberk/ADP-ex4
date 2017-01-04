@@ -111,14 +111,16 @@ void GameControl::addDriver(string input, char* argv[]) {
     Serializer serializer;
 
     //create socket
-    Socket * udp = new Udp(1, atoi(argv[1]), "localhost");
+    Socket * udp = new Udp(1, atoi(argv[1]), "127.0.0.1");
     udp->initialize();
-
-    for(int i = 0; i < atoi(input); i++){
+    cout << "Socket created on port " << argv[1] << "value " << udp << endl;
+    for(int i = 0; i < atoi(input.c_str()); i++){
         //gets the driver from the client
         udp->reciveData(buffer, sizeof(buffer));
+        string receive(buffer);
+        cout << "Received: " << receive << endl;
         //deserialize the driver from client
-        Driver * d = serializer.deserializeDriver(buffer);
+        Driver * d = serializer.deserializeDriver(receive);
         dispatcher->addDriver(d, udp);
         dispatcher->sendTaxi(d->getID());
     }

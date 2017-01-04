@@ -40,12 +40,15 @@ void TaxiDispatch::provideTaxi() {
 }
 
 void TaxiDispatch::addTaxi(Taxi * newTaxi) {
+    Serializer s;
     // If the taxi ID doesn't appear, we initialize it
     if (database.count(newTaxi->getID()) == 0) {
         database[newTaxi->getID()] = new DriverTaxiContainer();
     }
     newTaxi->setLocation(database[newTaxi->getID()]->location);
     database[newTaxi->getID()]->setTaxi(newTaxi);
+    string serial = s.serializeTaxi(newTaxi);
+    cout << serial << endl;
 }
 
 void TaxiDispatch::addDriver(Driver * newDriver, Socket* sock) {
@@ -69,8 +72,11 @@ void TaxiDispatch::sendTaxi(int id) {
     Serializer serializer;
     Taxi *taxiToSend = database[id]->getTaxi();
     buffer = serializer.serializeTaxi(taxiToSend);
+    string send(buffer);
     Socket *sock = database[id]->getSocket();
-    sock->sendData(buffer);
+    cout << "Preparing to send taxi " << send << "on " << sock << endl;
+    sock->sendData(send);
+    cout << "Sent taxi" << endl;
 }
 
 void TaxiDispatch::addTrip(TripInfo * newTrip) {

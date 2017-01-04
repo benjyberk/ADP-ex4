@@ -3,7 +3,6 @@
 // Advanced Programming 2016-2017 Bar Ilan
 //
 
-#include "client.h"
 #include "Driver.h"
 #include "Serializer.h"
 #include "StandardTaxi.h"
@@ -25,10 +24,9 @@ int main(int argc, char* argv[]) {
     Taxi * taxi;
     TripInfo * trip;
     char buffer[2048];
-
+    cout << argv[1] << argv[2] << endl;
     // Get program input (a single driver)
     getline(cin, input);
-
     // Tokenize the input
     tokens = gc.tokenizeByChar(input, ',');
 
@@ -43,20 +41,24 @@ int main(int argc, char* argv[]) {
 
     // Serialize the driver
     send = serial.serializeDriver(d);
-
+    cout << "Created driver object: " << send << endl;
     Socket * udp = new Udp(0, atoi(argv[2]), argv[1]);
     udp->initialize();
+    cout << "Created socket on port " << argv[2] << endl;
     // Send the serialized driver
     udp->sendData(send);
     // Receive the taxi
+    cout << "Preparing to receive taxi" << endl;
     udp->reciveData(buffer, sizeof(buffer));
+    cout << "Received Taxi: " << endl;
     receive = string(buffer);
     taxi = serial.deserializeTaxi(receive);
-
+    cout << "Received Taxi: " << receive << endl;
     while (true) {
         // Wait to receive the trip
         udp->reciveData(buffer, sizeof(buffer));
         receive = string(buffer);
+        cout << "Received info: " << receive << endl;
         if (receive.compare("X") == 0) {
             break;
         }
