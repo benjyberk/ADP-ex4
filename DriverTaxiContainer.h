@@ -9,6 +9,7 @@
 class Taxi;
 
 #include "Taxi.h"
+#include "Socket.h"
 
 /**
  * A container class that holds the driver and the taxi as well as their location
@@ -18,9 +19,13 @@ public:
     Taxi * taxi;
     Driver * driver;
     Point * location;
+    Socket * socket;
     DriverTaxiContainer();
     void setDriver(Driver *);
     void setTaxi(Taxi *);
+    void setSocket(Socket *);
+    Socket *getSocket();
+    Taxi *getTaxi();
     void setLocation(Point *);
     ~DriverTaxiContainer();
 };

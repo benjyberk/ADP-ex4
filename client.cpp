@@ -56,26 +56,21 @@ int main(int argc, char* argv[]) {
     while (true) {
         // Wait to receive the trip
         udp->reciveData(buffer, sizeof(buffer));
-        if (buffer[0] == 'X') {
+        receive = string(buffer);
+        if (receive.compare("X") == 0) {
             break;
         }
         receive = string(buffer);
         trip = serial.deserializeTrip(receive);
+        taxi->assignTrip(*trip);
         Point a = *taxi->getLocation();
         Point b = trip->getEndPoint();
         while (a != b) {
             udp->reciveData(buffer, sizeof(buffer));
-            if (buffer[0] == '9') {
-                clock.time++;
+            receive = string(buffer);
+            if (receive.compare("9") == 0) {
                 taxi->move();
                 cout << "Taxi Location: " << taxi->getLocation()->toString();
-                if (trip->getStartTime() == clock.time) {
-                    a = trip->getStartPoint();
-                    b = *taxi->getLocation();
-                    if (a == b) {
-                        taxi->assignTrip(*trip);
-                    }
-                }
             }
             a = *taxi->getLocation();
             b = trip->getEndPoint();

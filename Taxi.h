@@ -25,13 +25,13 @@ private:
     Driver* driver;
     Listener** listeners;
 protected:
-    bool isAssigned;
     Passenger* passengers;
     Point* location;
     int tariff;
     int upto;
     TripInfo currentTrip;
 public:
+    bool isAssigned;
     Taxi(int, CarMaker, Color);
     Color getColor();
     CarMaker getManufacturer();

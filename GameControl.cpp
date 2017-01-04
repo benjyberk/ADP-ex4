@@ -7,6 +7,9 @@
 #include "GameControl.h"
 #include "LuxuryTaxi.h"
 #include "StandardTaxi.h"
+#include "Socket.h"
+#include "Udp.h"
+#include "Serializer.h"
 
 using namespace std;
 
@@ -103,25 +106,22 @@ void GameControl::printTaxiLocation(string input) {
     cout << location->toString() << endl;
 }
 
-void GameControl::addDriver(string input) {
-    vector<string> tokens;
+void GameControl::addDriver(string input, char* argv[]) {
+    char buffer[2048];
+    Serializer serializer;
 
-    int id, age, experience, vehicleID;
-    MaritalStatus mStatus;
+    //create socket
+    Socket * udp = new Udp(1, atoi(argv[1]), "localhost");
+    udp->initialize();
 
-    // Tokenize the input
-    tokens = tokenizeByChar(input, ',');
-
-    id = atoi(tokens[0].c_str());
-    age = atoi(tokens[1].c_str());
-    mStatus = (MaritalStatus) enumFromString(tokens[2], 'M');
-    experience = atoi(tokens[3].c_str());
-    vehicleID = atoi(tokens[4].c_str());
-
-    // Generate the driver and add it to the dispatcher
-    Driver * d = new Driver(id, age, mStatus, experience, vehicleID);
-
-    dispatcher->addDriver(d);
+    for(int i = 0; i < atoi(input); i++){
+        //gets the driver from the client
+        udp->reciveData(buffer, sizeof(buffer));
+        //deserialize the driver from client
+        Driver * d = serializer.deserializeDriver(buffer);
+        dispatcher->addDriver(d, udp);
+        dispatcher->sendTaxi(d->getID());
+    }
 }
 
 int GameControl::enumFromString(string raw, char type) {
@@ -204,5 +204,9 @@ GameControl::~GameControl() {
 
 void GameControl::moveOneStep() {
     dispatcher->moveOneStep();
+}
+
+void GameControl::closingOperations() {
+    dispatcher->closingOperations();
 }
 

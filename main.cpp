@@ -12,25 +12,26 @@
 
 using namespace std;
 
-int main() {
+int main(int argc, char* argv[]) {
     client c;
     c.run();
     string lineInput;
     int getChoice;
+    bool leaveLoop = false;
     char dummy;
     GameControl * gc = new GameControl();
     gc->getGeneralInput();
 
     getline(cin, lineInput);
     getChoice = atoi(lineInput.c_str());
-    while (getChoice != 7) {
+    while (!leaveLoop) {
         if (getChoice < 6) {
             getline(cin, lineInput);
         }
         switch (getChoice) {
             case 1:
                 cout << "Entering case " << getChoice << endl;
-                gc->addDriver(lineInput);
+                gc->addDriver(lineInput, argv);
                 break;
             case 2:
                 cout << "Entering case " << getChoice << endl;
@@ -48,6 +49,10 @@ int main() {
                 cout << "Entering case " << getChoice << endl;
                 gc->assignTaxiTrips();
                 break;
+            case 7:
+                cout << "Entering case " << getChoice << endl;
+                gc->closingOperations();
+                leaveLoop = true;
             case 9:
                 cout << "Entering case " << getChoice << endl;
                 gc->moveOneStep();

@@ -19,6 +19,18 @@ void DriverTaxiContainer::setTaxi(Taxi * newTaxi) {
     taxi = newTaxi;
 }
 
+void DriverTaxiContainer::setSocket(Socket * newSocket) {
+    socket = newSocket;
+}
+
+Socket *DriverTaxiContainer::getSocket() {
+    return socket;
+}
+
+Taxi *DriverTaxiContainer::getTaxi() {
+    return taxi;
+}
+
 void DriverTaxiContainer::setLocation(Point * newLocation) {
     location = newLocation;
 }

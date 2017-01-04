@@ -28,7 +28,7 @@ public:
     std::vector<std::string> tokenizeByChar(std::string, char);
     GameControl();
     // Parses a driver from input and adds it to the Taxi Dispatcher
-    void addDriver(std::string);
+    void addDriver(std::string, char* args[]);
     // Parses a taxi from input and adds it to the Taxi Dispatcher
     void addTaxi(std::string input);
     // Parses the dimensions of the game, creates the gridmap and obstacles elements
@@ -41,6 +41,8 @@ public:
     void assignTaxiTrips();
     // Moves all taxis assigned on trips
     void moveOneStep();
+    // Close all sockets, release data
+    void closingOperations();
     ~GameControl();
 };
 
