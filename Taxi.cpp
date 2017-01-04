@@ -59,7 +59,7 @@ void Taxi::setDriver(Driver * newDriver) {
 
 void Taxi::assignTrip(TripInfo assign) {
     currentTrip = assign;
-    upto = assign.getRoute()->size() - 1;
+    upto = assign.getRoute()->size() - 2;
     isAssigned = true;
 }
 

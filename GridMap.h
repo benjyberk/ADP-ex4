@@ -26,6 +26,7 @@ protected:
     int maxWidth;
     // Initialized on construction
     std::vector<Point> obstacles;
+    std::vector<Point *> deleteLater;
 public:
     GraphSquare* grid[10][10];
     // The constructor method takes in the size required

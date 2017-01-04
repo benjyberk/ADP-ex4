@@ -34,7 +34,6 @@ std::string Serializer::serializeTaxi(Taxi * t) {
 }
 
 Taxi *Serializer::deserializeTaxi(std::string input) {
-    cout << "starting" << endl;
     int type, id, manu, color;
     char dummy;
     Taxi * returnObj;
@@ -63,14 +62,12 @@ std::string Serializer::serializeTrip(TripInfo * t) {
                 << ';' << t->getRoute()->size();
     // We now add the list of points:
     int size = t->getRoute()->size();
-    cout << "Size = " << size << endl;
 
     for (int i = 0; i < size; i++) {
         next = t->getRoute()->at(i);
         buildString << ';' << serializePoint(next);
     }
     buildString << ';';
-    cout << "Size = " << size << endl;
 
     return buildString.str();
 }
@@ -78,24 +75,22 @@ std::string Serializer::serializeTrip(TripInfo * t) {
 TripInfo *Serializer::deserializeTrip(std::string input) {
     int id, numPass, tarr, numELM, startTime;
 
-    Point *start, *end;
-    start = new Point();
-    end = new Point();
+    Point start, end;
     char dummy;
     TripInfo * returnObj;
     istringstream parser(input);
-    parser >> id >> dummy >> start->x >> dummy >> start->y >> dummy >> end->x >> dummy >> end->y >>
+    parser >> id >> dummy >> start.x >> dummy >> start.y >> dummy >> end.x >> dummy >> end.y >>
             dummy >> numPass >> dummy >> tarr >> dummy >> startTime >> dummy >> numELM >> dummy;
 
     vector<Point> * route = new vector<Point>();
     for (int i = 0; i < numELM; i++) {
 
-        Point * newPoint = new Point();
-        parser >> newPoint->x >> dummy >> newPoint->y >> dummy;
-        route->emplace_back(*newPoint);
+        Point newPoint;
+        parser >> newPoint.x >> dummy >> newPoint.y >> dummy;
+        route->emplace_back(newPoint);
     }
-    cout << route->size() << endl;
-    returnObj = new TripInfo(id, *start, *end, numPass, tarr, startTime);
+
+    returnObj = new TripInfo(id, start, end, numPass, tarr, startTime);
     returnObj->assignRoute(route);
 
     return returnObj;

@@ -70,3 +70,7 @@ int TripInfo::getTarrif() {
     return tarrif;
 }
 
+TripInfo::~TripInfo() {
+    //delete route;
+}
+

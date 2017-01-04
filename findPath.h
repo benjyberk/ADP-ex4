@@ -8,6 +8,7 @@
 
 #include <stack>
 #include <queue>
+#include <vector>
 #include "GridMap.h"
 
 /**
@@ -17,6 +18,8 @@
  * any inheritor that also contains the necessary fields).LL
  */
 class findPath {
+private:
+    std::vector<Point *> cleanup;
 public:
     /**
      * Given a generic GridMap, route a path from the source point to the destination point and
@@ -26,6 +29,8 @@ public:
      * @param destination the destination point
      */
     std::vector<Point>* bfsRoute(GridMap* search, Point source, Point destination);
+
+    virtual ~findPath();
 };
 
 

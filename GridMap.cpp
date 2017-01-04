@@ -101,7 +101,7 @@ void GridMap::reset() {
     for (int i = 0; i < maxWidth; i++) {
         for (int j = 0; j < maxHeight; j++) {
             grid[i][maxHeight - j - 1]->distanceFromSource = -1;
-            grid[i][maxHeight - j - 1]->predecessor = 0;
+            //grid[i][maxHeight - j - 1]->predecessor = 0;
         }
     }
 }

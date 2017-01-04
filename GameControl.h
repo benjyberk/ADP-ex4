@@ -37,8 +37,6 @@ public:
     void addRide(std::string);
     // Outputs the location of a taxi
     void printTaxiLocation(std::string);
-    // Assign all the trips queued.
-    void assignTaxiTrips();
     // Moves all taxis assigned on trips
     void moveOneStep();
     // Close all sockets, release data

@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     Taxi * taxi;
     TripInfo * trip;
     char buffer[2048];
-    cout << argv[1] << argv[2] << endl;
+
     // Get program input (a single driver)
     getline(cin, input);
     // Tokenize the input
@@ -41,25 +41,27 @@ int main(int argc, char* argv[]) {
 
     // Serialize the driver
     send = serial.serializeDriver(d);
-    cout << "Created driver object: " << send << endl;
-    Socket * udp = new Udp(0, atoi(argv[2]), argv[1]);
+
+    Socket * udp = new Udp(0, atoi(argv[2]), "127.0.0.1");
     udp->initialize();
-    cout << "Created socket on port " << argv[2] << endl;
+
     // Send the serialized driver
     udp->sendData(send);
+
     // Receive the taxi
-    cout << "Preparing to receive taxi" << endl;
     udp->reciveData(buffer, sizeof(buffer));
-    cout << "Received Taxi: " << endl;
+
+    // Deserialize the taxi
     receive = string(buffer);
     taxi = serial.deserializeTaxi(receive);
-    cout << "Received Taxi: " << receive << endl;
+
     while (true) {
         // Wait to receive the trip
         udp->reciveData(buffer, sizeof(buffer));
         receive = string(buffer);
-        cout << "Received info: " << receive << endl;
+
         if (receive.compare("X") == 0) {
+            // If, instead of receiving a trip, we receive an "end", end the program
             break;
         }
         receive = string(buffer);
@@ -67,81 +69,23 @@ int main(int argc, char* argv[]) {
         taxi->assignTrip(*trip);
         Point a = *taxi->getLocation();
         Point b = trip->getEndPoint();
+        // We loop through this whole trip
         while (a != b) {
             udp->reciveData(buffer, sizeof(buffer));
             receive = string(buffer);
+            // When we receive a 9 from the server, we know to move the taxi by one
             if (receive.compare("9") == 0) {
                 taxi->move();
-                cout << "Taxi Location: " << taxi->getLocation()->toString() << endl;
             }
             a = *taxi->getLocation();
             b = trip->getEndPoint();
         }
+        // We have completed one trip, we free the allocated memory
+        delete trip->getRoute();
+        delete trip;
     }
+    delete taxi->getLocation();
+    delete taxi;
     delete d;
+    delete udp;
 }
-
-/*Driver d(1,1,SINGLE,1,1);
-string serial;
-boost::iostreams::back_insert_device<std::string> inserter(serial);
-boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
-boost::archive::binary_oarchive oa(s);
-oa << d;
-s.flush();
-
-cout << serial << endl;
-Driver *d2;
-size_t len = serial.size();
-char * begin = (char *)serial.c_str();
-char * end = begin + serial.size();
-boost::iostreams::basic_array_source<char> device(begin, end);
-boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s2(device);
-boost::archive::binary_iarchive ia(s2);
-ia >> d2;*/
-
-/*
- *
-    Serializer serial;
-    string returnString;
-    findPath find;
-    vector<Point> v;
-    GridMap g(4, 4, v);
-
-    Driver d(1,21,DIVORCED,3,1);
-    cout << d.getID() << ":" << d.getYears() << ":" << d.getMarital() << ":" << d.getAge() << ":" <<endl;
-    returnString = serial.serializeDriver(&d);
-    //cout << returnString;
-
-    Driver *k;
-    k = serial.deserializeDriver(returnString);
-    cout << k->getID() << ":" << k->getYears() << ":" << k->getMarital() << ":" << k->getAge() << ":"<<endl;
-    cout << "@@@@@@@@@@@@@@@@@@@@" << endl;
-
-    LuxuryTaxi t(1,HONDA,RED);
-    returnString = serial.serializeTaxi(&t);
-    cout << returnString << endl;
-
-    Taxi* r;
-    r = serial.deserializeTaxi(returnString);
-    cout << r->getID() << ":" << r->getPrice() << endl;
-    cout << "@@@@@@@@@@@@@@@@@@@@" << endl;
-
-    TripInfo ti(5, Point(0,0), Point(3,2), 5, 5, 7);
-    vector<Point> * st = find.bfsRoute(&g, Point(0,0), Point(3,2));
-    ti.assignRoute(st);
-
-    returnString = serial.serializeTrip(&ti);
-    cout << returnString << endl;
-    for (int i = 0; i < ti.getRoute()->size(); i++) {
-        cout << ti.getRoute()->at(i).toString();
-    }
-    cout << endl;
-    TripInfo* rti;
-    rti = serial.deserializeTrip(returnString);
-    cout << rti->getRoute()->size() << endl;
-    for (int i = 0; i < rti->getRoute()->size(); i++) {
-        cout << rti->getRoute()->at(i).toString();
-    }
-    cout << endl;
-
- */

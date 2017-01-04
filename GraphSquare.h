@@ -18,7 +18,7 @@ class GraphSquare {
 public:
     Point* gridLocation;
     int distanceFromSource;
-    Point* predecessor;
+    Point predecessor;
     // Can be constructed either with a provided or not provided Point object
     GraphSquare(Point*);
     // If no Point is provided, one is initialized in this constructor

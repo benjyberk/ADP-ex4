@@ -27,38 +27,30 @@ int main(int argc, char* argv[]) {
         }
         switch (getChoice) {
             case 1:
-                cout << "Entering case " << getChoice << endl;
                 gc->addDriver(lineInput, argv);
                 break;
             case 2:
-                cout << "Entering case " << getChoice << endl;
                 gc->addRide(lineInput);
                 break;
             case 3:
-                cout << "Entering case " << getChoice << endl;
                 gc->addTaxi(lineInput);
                 break;
             case 4:
-                cout << "Entering case " << getChoice << endl;
                 gc->printTaxiLocation(lineInput);
                 break;
-            case 6:
-                cout << "Entering case " << getChoice << endl;
-                gc->assignTaxiTrips();
-                break;
             case 7:
-                cout << "Entering case " << getChoice << endl;
                 gc->closingOperations();
                 leaveLoop = true;
             case 9:
-                cout << "Entering case " << getChoice << endl;
                 gc->moveOneStep();
                 break;
             default:
                 break;
         }
-        getline(cin, lineInput);
-        getChoice = atoi(lineInput.c_str());
+        if (!leaveLoop) {
+            getline(cin, lineInput);
+            getChoice = atoi(lineInput.c_str());
+        }
     }
 
     delete gc;

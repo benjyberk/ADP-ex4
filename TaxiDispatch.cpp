@@ -9,36 +9,6 @@
 
 using namespace std;
 
-void TaxiDispatch::provideTaxi() {
-    // We loop through all the trips, assigning them/running them if possible
-    while (!trips.empty()) {
-        // We take the first trip
-        TripInfo current = trips[0];
-
-        // We search for a taxi/driver in the correct position
-        for (int i = 0; i < listeners.size(); i++) {
-            DriverLocationListener *foundListener = listeners[i];
-            Point a = *(foundListener->getLocation());
-            Point b = current.getStartPoint();
-            int foundID = foundListener->id;
-            // If we have found a taxi at the correct location
-            if (a == b) {
-                if (clock.time == current.getStartTime()) {
-                    // We assign the trip to the taxi
-                    database[foundID]->taxi->assignTrip(current);
-                    clock.time++;
-                    listeners.erase(listeners.begin() + i);
-                    listeners.push_back(foundListener);
-                    break;
-                }
-            }
-        }
-
-        //delete trips.front();
-        //trips.pop_front();
-    }
-}
-
 void TaxiDispatch::addTaxi(Taxi * newTaxi) {
     Serializer s;
     // If the taxi ID doesn't appear, we initialize it
@@ -48,7 +18,6 @@ void TaxiDispatch::addTaxi(Taxi * newTaxi) {
     newTaxi->setLocation(database[newTaxi->getID()]->location);
     database[newTaxi->getID()]->setTaxi(newTaxi);
     string serial = s.serializeTaxi(newTaxi);
-    cout << serial << endl;
 }
 
 void TaxiDispatch::addDriver(Driver * newDriver, Socket* sock) {
@@ -71,20 +40,22 @@ void TaxiDispatch::sendTaxi(int id) {
 
     Serializer serializer;
     Taxi *taxiToSend = database[id]->getTaxi();
+
+    // We load the serialized taxi into the buffer
     buffer = serializer.serializeTaxi(taxiToSend);
     string send(buffer);
     Socket *sock = database[id]->getSocket();
-    cout << "Preparing to send taxi " << send << "on " << sock << endl;
+
     sock->sendData(send);
-    cout << "Sent taxi" << endl;
 }
 
 void TaxiDispatch::addTrip(TripInfo * newTrip) {
     vector<Point> * r = router.bfsRoute(gridMap, newTrip->getStartPoint(), newTrip->getEndPoint());
-
+    // The calculated route is assigned to the taxi
     newTrip->assignRoute(r);
+
     // We add the trip to the list of trips
-    trips.push_back(*newTrip);
+    trips.push_back(newTrip);
 }
 
 Point *TaxiDispatch::getDriverLocation(int id) {
@@ -106,13 +77,13 @@ TaxiDispatch::~TaxiDispatch() {
         delete listeners[i];
     }
     for (int i = 0; i < trips.size(); i++) {
-        //delete trips[i];
+        delete trips[i]->getRoute();
+        delete trips[i];
     }
 
     for(taxi_driver_iterator iterator = database.begin(); iterator != database.end(); iterator++) {
         delete iterator->second;
     }
-
 }
 
 void TaxiDispatch::sendTrip() {
@@ -122,7 +93,7 @@ void TaxiDispatch::sendTrip() {
 void TaxiDispatch::moveOneStep() {
     // We increase the time by one
     clock.time++;
-    TripInfo current;
+    TripInfo *current;
     DriverLocationListener *foundListener;
     Serializer serializer;
     string buffer;
@@ -144,23 +115,22 @@ void TaxiDispatch::moveOneStep() {
         current = trips[i];
 
         // If we are at the right time for this  trip to start
-        if (clock.time == current.getStartTime()) {
+        if (clock.time == current->getStartTime()) {
             // We search for a taxi/driver in the correct position
             for (int j = 0; j < listeners.size(); j++) {
                 foundListener = listeners[j];
                 Point a = *(foundListener->getLocation());
-                Point b = current.getStartPoint();
+                Point b = current->getStartPoint();
                 // If we have found a taxi at the correct location
                 if (a == b) {
-                    cout << "Assigning taxi to trip ID " << current.getRideID() << endl;
+
                     int foundID = foundListener->id;
                     // We assign the trip to the taxi
-                    database[foundID]->taxi->assignTrip(current);
+                    database[foundID]->taxi->assignTrip(*current);
                     listeners.erase(listeners.begin() + j);
                     listeners.push_back(foundListener);
-
-                    ///////////
-                    buffer = serializer.serializeTrip(&current);
+                    // We send the client info on the assigned taxi
+                    buffer = serializer.serializeTrip(current);
                     Socket *sock = database[foundID]->getSocket();
                     sock->sendData(buffer);
 

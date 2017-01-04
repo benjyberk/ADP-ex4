@@ -9,19 +9,18 @@ GraphSquare::GraphSquare(Point* gridSpot) {
     // The distanceFromSource is initialized to -1
     gridLocation = gridSpot;
     distanceFromSource = -1;
-    predecessor = new Point(-1,-1);
+    predecessor = Point(-1,-1);
 }
 
 GraphSquare::GraphSquare() {
     // The default values are initialized to -1, and a new Point is provided
     distanceFromSource = -1;
     gridLocation = new Point(-1,-1);
-    predecessor = new Point(-1,-1);
+    predecessor = Point(-1,-1);
 }
 
 GraphSquare::~GraphSquare() {
     delete gridLocation;
-    delete predecessor;
 }
 
 bool GraphSquare::operator ==(GraphSquare other) {

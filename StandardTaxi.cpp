@@ -16,7 +16,6 @@ int StandardTaxi::move() {
     if (isAssigned) {
         location->x = (currentTrip.getRoute())->at(upto).x;
         location->y = (currentTrip.getRoute())->at(upto).y;
-        cout << "New pos: " << location->toString() << endl;
         upto--;
         if (upto < 0) {
             isAssigned = false;

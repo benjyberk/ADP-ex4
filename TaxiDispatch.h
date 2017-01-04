@@ -31,15 +31,13 @@ typedef std::map<int, DriverTaxiContainer *>::iterator taxi_driver_iterator;
 class TaxiDispatch {
 private:
     std::map<int, DriverTaxiContainer *> database;
-    std::deque<TripInfo> trips;
+    std::deque<TripInfo *> trips;
     std::vector<DriverLocationListener *> listeners;
     GridMap * gridMap;
     findPath router;
     Clock clock;
 public:
     TaxiDispatch(GridMap *, Clock);
-    // Runs the trips in the trips database
-    void provideTaxi();
     void addTaxi(Taxi *);
     void addDriver(Driver *, Socket *);
     void closingOperations();

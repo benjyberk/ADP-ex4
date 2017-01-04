@@ -14,6 +14,8 @@
 using namespace std;
 
 GameControl::GameControl() {
+    gridmap = 0;
+    dispatcher = 0;
 }
 
 
@@ -110,15 +112,16 @@ void GameControl::addDriver(string input, char* argv[]) {
     char buffer[2048];
     Serializer serializer;
 
-    //create socket
+    //Create the socket to receive the driver
     Socket * udp = new Udp(1, atoi(argv[1]), "127.0.0.1");
     udp->initialize();
-    cout << "Socket created on port " << argv[1] << "value " << udp << endl;
+
+    // Loop through all clients, receiving their info
     for(int i = 0; i < atoi(input.c_str()); i++){
         //gets the driver from the client
         udp->reciveData(buffer, sizeof(buffer));
         string receive(buffer);
-        cout << "Received: " << receive << endl;
+
         //deserialize the driver from client
         Driver * d = serializer.deserializeDriver(receive);
         dispatcher->addDriver(d, udp);
@@ -195,13 +198,13 @@ vector<string> GameControl::tokenizeByChar(string input, char delim) {
     return tokens;
 }
 
-void GameControl::assignTaxiTrips() {
-    dispatcher->provideTaxi();
-}
-
 GameControl::~GameControl() {
-    delete gridmap;
-    delete dispatcher;
+    if (gridmap != 0) {
+        delete gridmap;
+    }
+    if (dispatcher != 0) {
+        delete dispatcher;
+    }
 }
 
 void GameControl::moveOneStep() {

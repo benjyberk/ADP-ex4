@@ -6,6 +6,7 @@
 #include "findPath.h"
 using namespace std;
 
+
 vector<Point>* findPath::bfsRoute(GridMap* search, Point source, Point destination) {
     queue<GraphSquare*> nodes;
     GraphSquare* check;
@@ -34,7 +35,7 @@ vector<Point>* findPath::bfsRoute(GridMap* search, Point source, Point destinati
         for (int i = 0; i < adjacent.size(); i++) {
             if (adjacent[i]->distanceFromSource == -1) {
                 adjacent[i]->distanceFromSource = check->distanceFromSource + 1;
-                adjacent[i]->predecessor = checkPos;
+                adjacent[i]->predecessor = *checkPos;
                 nodes.push(adjacent[i]);
                 // If the node is found, we may leave the loop
                 if (*adjacent[i]->gridLocation == destination) {
@@ -53,15 +54,25 @@ vector<Point>* findPath::bfsRoute(GridMap* search, Point source, Point destinati
     // We follow the trail back from the source to the destination using the 'predecessor' member.
     while (!found) {
         Point* current = check->gridLocation;
-        reverseOrder->emplace_back(*current);
+
+        Point * newPoint = new Point(current->x, current->y);
+        cleanup.push_back(newPoint);
+
+        reverseOrder->emplace_back(*newPoint);
         if (*current == source) {
             found = true;
         }
             // The next node is followed backwards
         else {
-            check = search->getNode(*(check->predecessor));
+            check = search->getNode(check->predecessor);
         }
     }
     search->reset();
     return reverseOrder;
+}
+
+findPath::~findPath() {
+    for (int i = 0; i < cleanup.size(); i++) {
+        delete cleanup[i];
+    }
 }

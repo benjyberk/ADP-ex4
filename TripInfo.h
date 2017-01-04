@@ -33,6 +33,9 @@ public:
     std::vector<Point>* getRoute();
     int getRideID();
     int getCurrentDistance();
+
+    virtual ~TripInfo();
+
     Point getStartPoint();
     Point getEndPoint();
 };
