@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
             receive = string(buffer);
             if (receive.compare("9") == 0) {
                 taxi->move();
-                cout << "Taxi Location: " << taxi->getLocation()->toString();
+                cout << "Taxi Location: " << taxi->getLocation()->toString() << endl;
             }
             a = *taxi->getLocation();
             b = trip->getEndPoint();
