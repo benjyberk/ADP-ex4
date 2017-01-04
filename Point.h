@@ -27,6 +27,7 @@ public:
     virtual std::string toString();
     // Compares two points with one another
     virtual bool operator==(Point &other);
+    virtual bool operator!=(Point &other);
     int distanceTo(Point);
 };
 

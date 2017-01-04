@@ -15,6 +15,7 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
+    Clock clock;
     vector<string> tokens;
     GameControl gc;
     int id, age, experience, vehicleID;
@@ -45,14 +46,41 @@ int main(int argc, char* argv[]) {
 
     Socket * udp = new Udp(0, atoi(argv[2]), argv[1]);
     udp->initialize();
+    // Send the serialized driver
     udp->sendData(send);
+    // Receive the taxi
     udp->reciveData(buffer, sizeof(buffer));
     receive = string(buffer);
     taxi = serial.deserializeTaxi(receive);
-    udp->reciveData(buffer, sizeof(buffer));
-    receive = string(buffer);
-    trip = serial.deserializeTrip(receive);
 
+    while (true) {
+        // Wait to receive the trip
+        udp->reciveData(buffer, sizeof(buffer));
+        if (buffer[0] == 'X') {
+            break;
+        }
+        receive = string(buffer);
+        trip = serial.deserializeTrip(receive);
+        Point a = *taxi->getLocation();
+        Point b = trip->getEndPoint();
+        while (a != b) {
+            udp->reciveData(buffer, sizeof(buffer));
+            if (buffer[0] == '9') {
+                clock.time++;
+                taxi->move();
+                cout << "Taxi Location: " << taxi->getLocation()->toString();
+                if (trip->getStartTime() == clock.time) {
+                    a = trip->getStartPoint();
+                    b = *taxi->getLocation();
+                    if (a == b) {
+                        taxi->assignTrip(*trip);
+                    }
+                }
+            }
+            a = *taxi->getLocation();
+            b = trip->getEndPoint();
+        }
+    }
     delete d;
 }
 

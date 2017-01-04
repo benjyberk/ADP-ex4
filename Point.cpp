@@ -34,6 +34,13 @@ bool Point::operator==(Point& other) {
     return ((x == other.x) && (y == other.y));
 }
 
+/**
+ * Sees if two points are not equal
+ */
+bool Point::operator!=(Point& other) {
+    return ((x != other.x) || (y != other.y));
+}
+
 int Point::distanceTo(Point) {
     return 0;
 }
