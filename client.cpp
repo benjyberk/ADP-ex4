@@ -10,6 +10,7 @@
 #include "GameControl.h"
 #include "Socket.h"
 #include "Udp.h"
+#include "Tcp.h"
 
 using namespace std;
 
@@ -42,22 +43,24 @@ int main(int argc, char* argv[]) {
     // Serialize the driver
     send = serial.serializeDriver(d);
 
-    Socket * udp = new Udp(0, atoi(argv[2]), "127.0.0.1");
-    udp->initialize();
+    Tcp * tcp = new Tcp(0, atoi(argv[2]), "127.0.0.1");
+    tcp->initialize();
 
     // Send the serialized driver
-    udp->sendData(send);
-    cout << "i, the client, sent a driver" << endl;
+    tcp->sendData(send, 0);
+    cout << "i, the client, sent a driver: " << send <<endl;
     // Receive the taxi
-    udp->reciveData(buffer, sizeof(buffer));
-    cout << "i, the client, recived a taxi" << endl;
+    tcp->reciveData(buffer, sizeof(buffer), 0);
     // Deserialize the taxi
     receive = string(buffer);
+    cout << "i, the client, recived a taxi: " << receive <<endl;
     taxi = serial.deserializeTaxi(receive);
+
+
 
     while (true) {
         // Wait to receive the trip
-        udp->reciveData(buffer, sizeof(buffer));
+        tcp->reciveData(buffer, sizeof(buffer), 0);
         cout << "got the trip"<<endl;
         receive = string(buffer);
 
@@ -67,13 +70,13 @@ int main(int argc, char* argv[]) {
         }
         receive = string(buffer);
         trip = serial.deserializeTrip(receive);
-        cout << "our trip is" << trip->getRideID() << endl;
+        cout << "our trip is: " << receive << endl;
         taxi->assignTrip(*trip);
         Point a = *taxi->getLocation();
         Point b = trip->getEndPoint();
         // We loop through this whole trip
         while (a != b) {
-            udp->reciveData(buffer, sizeof(buffer));
+            tcp->reciveData(buffer, sizeof(buffer), 0);
             receive = string(buffer);
             cout << "recived" << buffer << endl;
             // When we receive a 9 from the server, we know to move the taxi by one
@@ -90,5 +93,5 @@ int main(int argc, char* argv[]) {
     delete taxi->getLocation();
     delete taxi;
     delete d;
-    delete udp;
+    delete tcp;
 }

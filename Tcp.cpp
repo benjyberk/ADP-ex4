@@ -127,8 +127,8 @@ int Tcp::reciveData(char* buffer, int size, int id) {
 	return read_bytes;
 }
 
-int Tcp::accept() {
-    //accept
+int Tcp::acceptSock() {
+    //acceptSock
     struct sockaddr_in client_sin;
     unsigned int addr_len = sizeof(client_sin);
     this->descriptorCommunicateClient[upto] = accept(this->socketDescriptor,

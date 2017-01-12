@@ -19,13 +19,13 @@ public:
     Taxi * taxi;
     Driver * driver;
     Point * location;
-    Socket * socket;
+    int socketNum;
     DriverTaxiContainer();
     void setDriver(Driver *);
     void setTaxi(Taxi *);
-    void setSocket(Socket *);
-    Socket *getSocket();
     Taxi *getTaxi();
+    void assignSocketNum(int socket);
+    int getSocketNum();
     void setLocation(Point *);
     ~DriverTaxiContainer();
 };

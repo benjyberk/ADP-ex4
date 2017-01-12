@@ -19,14 +19,6 @@ void DriverTaxiContainer::setTaxi(Taxi * newTaxi) {
     taxi = newTaxi;
 }
 
-void DriverTaxiContainer::setSocket(Socket * newSocket) {
-    socket = newSocket;
-}
-
-Socket *DriverTaxiContainer::getSocket() {
-    return socket;
-}
-
 Taxi *DriverTaxiContainer::getTaxi() {
     return taxi;
 }
@@ -43,4 +35,12 @@ DriverTaxiContainer::~DriverTaxiContainer() {
         delete driver;
     }
     delete location;
+}
+
+void DriverTaxiContainer::assignSocketNum(int socket) {
+    socketNum = socket;
+}
+
+int DriverTaxiContainer::getSocketNum() {
+    return socketNum;
 }

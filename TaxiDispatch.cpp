@@ -6,6 +6,7 @@
 #include "TaxiDispatch.h"
 #include "findPath.h"
 #include "Serializer.h"
+#include "Tcp.h"
 
 using namespace std;
 
@@ -20,7 +21,7 @@ void TaxiDispatch::addTaxi(Taxi * newTaxi) {
     string serial = s.serializeTaxi(newTaxi);
 }
 
-void TaxiDispatch::addDriver(Driver * newDriver, Socket* sock) {
+void TaxiDispatch::addDriver(Driver * newDriver, int tcp) {
     // If the driver id doesn't appear, we initialize it
     if (database.count(newDriver->getID()) == 0) {
         database[newDriver->getID()] = new DriverTaxiContainer();
@@ -31,7 +32,7 @@ void TaxiDispatch::addDriver(Driver * newDriver, Socket* sock) {
     DriverLocationListener * l = new DriverLocationListener(start, newDriver->getID());
     listeners.push_back(l);
     database[newDriver->getID()]->setDriver(newDriver);
-    database[newDriver->getID()]->setSocket(sock);
+    database[newDriver->getID()]->assignSocketNum(tcp);
 }
 
 void TaxiDispatch::sendTaxi(int id) {
@@ -44,9 +45,8 @@ void TaxiDispatch::sendTaxi(int id) {
     // We load the serialized taxi into the buffer
     buffer = serializer.serializeTaxi(taxiToSend);
     string send(buffer);
-    Socket *sock = database[id]->getSocket();
-
-    sock->sendData(send);
+    cout << "sending this taxi:" << send << endl;
+    tcp->sendData(send, database[id]->getSocketNum());
 }
 
 void TaxiDispatch::addTrip(TripInfo * newTrip) {
@@ -105,8 +105,7 @@ void TaxiDispatch::moveOneStep() {
         if (iterator->second->taxi->isAssigned) {
             int id = iterator->second->taxi->getID();
             iterator->second->taxi->move();
-            Socket *sock = database[id]->getSocket();
-            sock->sendData("9");
+            tcp->sendData("9", database[id]->getSocketNum());
         }
     }
 
@@ -131,9 +130,8 @@ void TaxiDispatch::moveOneStep() {
                     listeners.push_back(foundListener);
                     // We send the client info on the assigned taxi
                     buffer = serializer.serializeTrip(current);
-                    Socket *sock = database[foundID]->getSocket();
-                    sock->sendData(buffer);
-                    cout << "sent trip" << endl;
+                    tcp->sendData(buffer, database[foundID]->getSocketNum());
+                    cout << "sent trip" << buffer<< endl;
 
                     break;
                 }
@@ -142,13 +140,18 @@ void TaxiDispatch::moveOneStep() {
     }
 }
 
+void TaxiDispatch::assignSocket(Tcp *tcp1) {
+    tcp = tcp1;
+}
+
 void TaxiDispatch::closingOperations() {
     for(taxi_driver_iterator iterator = database.begin(); iterator != database.end(); iterator++) {
         if (iterator->second->driver != 0) {
             int id = iterator->second->taxi->getID();
-            Socket *sock = database[id]->getSocket();
-            sock->sendData("X");
-            delete sock;
+            tcp->sendData("X", database[id]->getSocketNum());
         }
     }
+    delete tcp;
 }
+
+

@@ -116,19 +116,20 @@ void GameControl::addDriver(string input, char* argv[]) {
     //Create the socket to receive the driver
     Tcp * tcp = new Tcp(1, atoi(argv[1]), "127.0.0.1");
     tcp->initialize();
+    dispatcher->assignSocket(tcp);
 
     // Loop through all clients, receiving their info
     for(int i = 0; i < atoi(input.c_str()); i++){
-        tcp->accept();
+        tcp->acceptSock();
 
         //gets the driver from the client
-        tcp->reciveData(buffer, sizeof(buffer));
+        tcp->reciveData(buffer, sizeof(buffer), tcp->upto);
         cout << "recived data from client" << i << endl;
         string receive(buffer);
 
         //deserialize the driver from client
         Driver * d = serializer.deserializeDriver(receive);
-        dispatcher->addDriver(d, tcp);
+        dispatcher->addDriver(d, tcp->upto);
         cout << "sending taxi to client" << i << endl;
         dispatcher->sendTaxi(d->getID());
     }
