@@ -82,7 +82,8 @@ public:
 	***********************************************************************/
 	virtual int reciveData(char* buffer, int size) = 0;
 
-
+    virtual int accept();
+    virtual int upto;
 
 
 };
