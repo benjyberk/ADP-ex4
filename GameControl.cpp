@@ -120,11 +120,13 @@ void GameControl::addDriver(string input, char* argv[]) {
     for(int i = 0; i < atoi(input.c_str()); i++){
         //gets the driver from the client
         udp->reciveData(buffer, sizeof(buffer));
+        cout << "recived data from client" << i << endl;
         string receive(buffer);
 
         //deserialize the driver from client
         Driver * d = serializer.deserializeDriver(receive);
         dispatcher->addDriver(d, udp);
+        cout << "sending taxi to client" << i << endl;
         dispatcher->sendTaxi(d->getID());
     }
 }

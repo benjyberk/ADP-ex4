@@ -47,10 +47,10 @@ int main(int argc, char* argv[]) {
 
     // Send the serialized driver
     udp->sendData(send);
-
+    cout << "i, the client, sent a driver" << endl;
     // Receive the taxi
     udp->reciveData(buffer, sizeof(buffer));
-
+    cout << "i, the client, recived a taxi" << endl;
     // Deserialize the taxi
     receive = string(buffer);
     taxi = serial.deserializeTaxi(receive);
@@ -58,6 +58,7 @@ int main(int argc, char* argv[]) {
     while (true) {
         // Wait to receive the trip
         udp->reciveData(buffer, sizeof(buffer));
+        cout << "got the trip"<<endl;
         receive = string(buffer);
 
         if (receive.compare("X") == 0) {
@@ -66,6 +67,7 @@ int main(int argc, char* argv[]) {
         }
         receive = string(buffer);
         trip = serial.deserializeTrip(receive);
+        cout << "our trip is" << trip->getRideID() << endl;
         taxi->assignTrip(*trip);
         Point a = *taxi->getLocation();
         Point b = trip->getEndPoint();
@@ -73,6 +75,7 @@ int main(int argc, char* argv[]) {
         while (a != b) {
             udp->reciveData(buffer, sizeof(buffer));
             receive = string(buffer);
+            cout << "recived" << buffer << endl;
             // When we receive a 9 from the server, we know to move the taxi by one
             if (receive.compare("9") == 0) {
                 taxi->move();

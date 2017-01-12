@@ -133,6 +133,7 @@ void TaxiDispatch::moveOneStep() {
                     buffer = serializer.serializeTrip(current);
                     Socket *sock = database[foundID]->getSocket();
                     sock->sendData(buffer);
+                    cout << "sent trip" << endl;
 
                     break;
                 }
