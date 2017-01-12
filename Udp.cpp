@@ -66,7 +66,7 @@ int Udp::initialize() {
 * The Function operation: sending the input data to the socket         *
 * who connect to this socket. check if send successfully				   *
 ***********************************************************************/
-int Udp::sendData(string data) {
+int Udp::sendData(string data, int a) {
 	//initialize the struct
 	struct sockaddr_in sin;
 	memset(&sin, 0, sizeof(sin));
@@ -93,7 +93,7 @@ int Udp::sendData(string data) {
 * The Function operation: getting data from the other socket check if  *
 *  there were no error reciving and print							   *
 ***********************************************************************/
-int Udp::reciveData(char* buffer, int size) {
+int Udp::reciveData(char* buffer, int size, int a) {
 	struct sockaddr_in to;
 	unsigned int to_len = sizeof(struct sockaddr_in);
 	//receive
@@ -111,4 +111,8 @@ int Udp::reciveData(char* buffer, int size) {
 //	cout<<buffer<<endl;
 	//return correct if there were no error
 	return bytes;
+}
+
+int Udp::acceptSock() {
+	return 0;
 }

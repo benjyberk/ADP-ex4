@@ -21,6 +21,7 @@ class DriverTaxiContainer;
 #include "findPath.h"
 #include "Clock.h"
 #include "Socket.h"
+#include "Tcp.h"
 
 /**
  * The TaxiDispatcher holds all trip orders as well as taxis, drivers
@@ -36,10 +37,11 @@ private:
     GridMap * gridMap;
     findPath router;
     Clock clock;
+    Tcp *tcp;
 public:
     TaxiDispatch(GridMap *, Clock);
     void addTaxi(Taxi *);
-    void addDriver(Driver *, Socket *);
+    void addDriver(Driver *, int);
     void closingOperations();
     void addTrip(TripInfo *);
     // Moves all assigned taxis along their way
@@ -47,6 +49,7 @@ public:
     Point * getDriverLocation(int id);
     void sendTaxi(int id);
     void sendTrip();
+    void assignSocket(Tcp *tcp);
     ~TaxiDispatch();
 };
 

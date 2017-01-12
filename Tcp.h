@@ -51,7 +51,7 @@ public:
 	***********************************************************************/
 	int reciveData(char* buffer, int size, int id);
 
-    int accept();
+    int acceptSock();
 };
 
 #endif /* TCP_H_ */
