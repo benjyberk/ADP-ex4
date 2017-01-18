@@ -70,7 +70,7 @@ int Tcp::initialize() {
 			return ERROR_LISTEN;
 		}
 
-	//if client
+	//if client does
 	} else {
 		struct sockaddr_in sin;
 		memset(&sin, 0, sizeof(sin));
