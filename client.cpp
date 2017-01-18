@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
     tcp->initialize();
 
     // Send the serialized driver
-    tcp->sendData(send, 0);
+    cout << "Send status: " << tcp->sendData(send, 0) << endl;
     cout << "i, the client, sent a driver: " << send <<endl;
     // Receive the taxi
     tcp->reciveData(buffer, sizeof(buffer), 0);
@@ -59,12 +59,14 @@ int main(int argc, char* argv[]) {
 
 
     while (true) {
+        cout << "recived" << buffer << endl;
         // Wait to receive the trip
         tcp->reciveData(buffer, sizeof(buffer), 0);
         cout << "got the trip"<<endl;
         receive = string(buffer);
 
-        if (receive.compare("X") == 0) {
+        if (receive.compare(0,1,"X") == 0) {
+            cout << "Ending" << endl;
             // If, instead of receiving a trip, we receive an "end", end the program
             break;
         }
@@ -80,7 +82,8 @@ int main(int argc, char* argv[]) {
             receive = string(buffer);
             cout << "recived" << buffer << endl;
             // When we receive a 9 from the server, we know to move the taxi by one
-            if (receive.compare("9") == 0) {
+            if (receive.compare(0,1,"M") == 0) {
+                cout << "Moving" << endl;
                 taxi->move();
             }
             a = *taxi->getLocation();

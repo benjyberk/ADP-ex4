@@ -123,14 +123,14 @@ void GameControl::addDriver(string input, char* argv[]) {
         tcp->acceptSock();
 
         //gets the driver from the client
-        tcp->reciveData(buffer, sizeof(buffer), tcp->upto);
-        cout << "recived data from client" << i << endl;
+        cout << "Receive status: " << tcp->reciveData(buffer, sizeof(buffer), tcp->upto - 1) << endl;
         string receive(buffer);
+        cout << "recived data from client number " << i << ", " << receive << endl;
 
         //deserialize the driver from client
         Driver * d = serializer.deserializeDriver(receive);
-        dispatcher->addDriver(d, tcp->upto);
-        cout << "sending taxi to client" << i << endl;
+        dispatcher->addDriver(d, tcp->upto - 1);
+        cout << "sending taxi to client: " << i << endl;
         dispatcher->sendTaxi(d->getID());
     }
 }

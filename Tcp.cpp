@@ -28,7 +28,12 @@ Tcp::Tcp(bool isServers, int port_num, string ip) {
 * The Function operation: default destructor					       *
 ***********************************************************************/
 Tcp::~Tcp() {
-	// TODO Auto-generated destructor stub
+    for (int i = 0; i < freeSock.size(); i++) {
+        delete freeSock[i];
+    }
+    for (int i = 0; i < freeAddr.size(); i++) {
+        delete freeAddr[i];
+    }
 }
 
 /***********************************************************************
@@ -129,10 +134,15 @@ int Tcp::reciveData(char* buffer, int size, int id) {
 
 int Tcp::acceptSock() {
     //acceptSock
-    struct sockaddr_in client_sin;
-    unsigned int addr_len = sizeof(client_sin);
+    struct sockaddr_in * client_sin = new struct sockaddr_in;
+    unsigned int * addr_len = new unsigned int;
+
+    freeSock.push_back(client_sin);
+    freeAddr.push_back(addr_len);
+
+    *addr_len = sizeof(*client_sin);
     this->descriptorCommunicateClient[upto] = accept(this->socketDescriptor,
-                                               (struct sockaddr *) &client_sin, &addr_len);
+                                               (struct sockaddr *) client_sin, addr_len);
     if (this->descriptorCommunicateClient[upto] < 0) {
         //return an error represent error at this method
         return ERROR_ACCEPT;
