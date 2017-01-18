@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
 
     while (true) {
         cout << "recived" << buffer << endl;
-        // Wait to receive the trip
+        // Wait to receive the trip stuff
         tcp->reciveData(buffer, sizeof(buffer), 0);
         cout << "got the trip"<<endl;
         receive = string(buffer);
