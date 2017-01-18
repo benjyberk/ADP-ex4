@@ -105,7 +105,7 @@ void TaxiDispatch::moveOneStep() {
         if (iterator->second->taxi->isAssigned) {
             int id = iterator->second->taxi->getID();
             iterator->second->taxi->move();
-            tcp->sendData("9", database[id]->getSocketNum());
+            tcp->sendData("M", database[id]->getSocketNum());
         }
     }
 

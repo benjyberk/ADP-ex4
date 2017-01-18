@@ -6,11 +6,14 @@
 #ifndef TCP_H_
 #define TCP_H_
 
+#include <vector>
 #include "Socket.h"
 
 class Tcp: public Socket {
 private:
 	int descriptorCommunicateClient[500];
+    vector<unsigned int *> freeAddr;
+    vector<struct sockaddr_in *> freeSock;
 public:
 	/***********************************************************************
 	* function name: Tcp												   *
