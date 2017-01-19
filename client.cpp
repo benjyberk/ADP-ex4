@@ -48,53 +48,46 @@ int main(int argc, char* argv[]) {
     tcp->initialize();
 
     // Send the serialized driver
-    cout << "Send status: " << tcp->sendData(send, 0) << endl;
-    cout << "i, the client, sent a driver: " << send <<endl;
+    tcp->sendData(send, 0);
 
     // Receive the taxi
     tcp->reciveData(buffer, sizeof(buffer), 0);
     // Deserialize the taxi
     receive = string(buffer);
-    cout << "i, the client, recived a taxi: " << receive <<endl;
     taxi = serial.deserializeTaxi(receive);
 
-
-
     while (keepGoing) {
-        cout << "recived" << buffer << endl;
-        // Wait to receive the trip stuff
+        // Wait to receive the trip details (or the ending signal)
         tcp->reciveData(buffer, sizeof(buffer), 0);
-        cout << "got the trip"<<endl;
         receive = string(buffer);
 
         if (receive.compare(0,1,"X") == 0) {
-            cout << "Ending" << endl;
             // If, instead of receiving a trip, we receive an "end", end the program
             break;
         }
 
+        // Deserialize the trip and assign it to our taxi
         receive = string(buffer);
         trip = serial.deserializeTrip(receive);
-        cout << "our trip is: " << receive << endl;
         taxi->assignTrip(*trip);
+
         Point a = *taxi->getLocation();
         Point b = trip->getEndPoint();
-        // We loop through this whole trip
+        // We loop through this whole trip until we reach the end, or are told to end
         while (a != b) {
             tcp->reciveData(buffer, sizeof(buffer), 0);
             receive = string(buffer);
-            cout << "recived" << buffer << endl;
+
             // When we receive a 9 from the server, we know to move the taxi by one
             if (receive.compare(0,1,"M") == 0) {
-                cout << "Moving" << endl;
                 taxi->move();
             }
+            // When we receive an X from the server, we leave our loop entirely
             if (receive.compare(0,1,"X") == 0) {
-                cout << "Ending" << endl;
                 keepGoing = false;
-                // If, instead of receiving a trip, we receive an "end", end the program
                 break;
             }
+
             a = *taxi->getLocation();
             b = trip->getEndPoint();
         }

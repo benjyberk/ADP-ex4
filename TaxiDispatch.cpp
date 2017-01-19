@@ -45,30 +45,25 @@ void TaxiDispatch::sendTaxi(int * refID) {
     // We load the serialized taxi into the buffer
     buffer = serializer.serializeTaxi(taxiToSend);
     string send(buffer);
-    cout << "sending this taxi:" << send << endl;
-    tcp->sendData(send, database[id]->getSocketNum());
+    // The taxi is sent
+   tcp->sendData(send, database[id]->getSocketNum());
 }
 
 void TaxiDispatch::addTrip(TripInfo * getTrip) {
-    cout << "Approaching lock" << endl;
+    // We lock the thread to avoid race conditions (for the bfsRouting algorithm)
     pthread_mutex_lock(&lock);
-    cout << "Locked" << endl;
 
     TripInfo * newTrip = getTrip;
 
     vector<Point> * r = router.bfsRoute(gridMap, newTrip->getStartPoint(), newTrip->getEndPoint());
     // The calculated route is assigned to the taxi
     newTrip->assignRoute(r);
-    cout << "Finished calculations" << endl;
+
     // We add the trip to the list of trips
     trips.push_back(newTrip);
-    Serializer s;
-    string a = s.serializeTrip(newTrip);
-    cout << a << endl;
 
-    cout << "Unlocking" << endl;
+    // The thread is finished and thus unlocks
     pthread_mutex_unlock(&lock);
-    //pthread_exit(0);
     return;
 }
 
@@ -86,7 +81,7 @@ TaxiDispatch::TaxiDispatch(GridMap * grid, Clock newClock) {
     clock = newClock;
 
     if (pthread_mutex_init(&lock, NULL) != 0) {
-        cout << "Mutex initialization failed" << endl;
+        //"Mutex initialization failed"
     }
 }
 
@@ -151,7 +146,6 @@ void TaxiDispatch::moveOneStep() {
                     // We send the client info on the assigned taxi
                     buffer = serializer.serializeTrip(current);
                     tcp->sendData(buffer, database[foundID]->getSocketNum());
-                    cout << "sent trip" << buffer<< endl;
 
                     break;
                 }
@@ -168,7 +162,7 @@ void TaxiDispatch::closingOperations() {
     for(taxi_driver_iterator iterator = database.begin(); iterator != database.end(); iterator++) {
         if (iterator->second->driver != 0) {
             int id = iterator->second->taxi->getID();
-            cout << "Sent closing data with result " << tcp->sendData("X", database[id]->getSocketNum()) << endl;
+            tcp->sendData("X", database[id]->getSocketNum());
         }
     }
     delete tcp;

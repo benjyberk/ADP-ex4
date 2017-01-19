@@ -104,11 +104,11 @@ void GameControl::addRide(string input) {
     p->dispatcher = dispatcher;
 
     // The trip is generated based on input
-    cout << "creating thread" << endl;
+    // We create a thread to handle the processing of the trip
     if (pthread_create(&oneThread, NULL, tripCreationHelper, (void *) p) != 0) {
-        cout << "Error creating thread" << endl;
+        //"Error creating thread";
     }
-
+    // We add our thread id to the list for later 'joining' when necessary
     threadDB.push_back(oneThread);
 }
 
@@ -135,26 +135,24 @@ void GameControl::addDriver(string input, char* argv[]) {
         pthread_t oneThread;
         tcp->acceptSock();
 
-        //gets the driver from the client
-        cout << "Receive status: " << tcp->reciveData(buffer, sizeof(buffer), tcp->upto - 1) << endl;
+        //Gets the driver from the client using the socket based on what the tcp socket is up to
+        tcp->reciveData(buffer, sizeof(buffer), tcp->upto - 1);
         string receive(buffer);
-        cout << "recived data from client number " << i << ", " << receive << endl;
 
         //deserialize the driver from client
         Driver * d = serializer.deserializeDriver(receive);
         dispatcher->addDriver(d, tcp->upto - 1);
-        cout << "sending taxi to client: " << i << endl;
 
-        // Create the thread to communicate with client
+        // Create the thread to communicate with client (to send back the taxi)
         int id = d->getID();
         sendTaxiParams p;
         p.id = &id;
         p.dispatcher = dispatcher;
 
         if (pthread_create(&oneThread, NULL, clientCreationHelper, (void *) &p) != 0) {
-            cout << "Error creating thread" << endl;
+            //"Error creating thread";
         }
-
+        // Add the thread to our list for later joining
         threadIDs.push_back(oneThread);
     }
     finishInput(&threadIDs);
@@ -265,9 +263,7 @@ void * GameControl::clientCreationHelper(void *generic) {
 }
 
 void * GameControl::tripCreationHelper(void * generic) {
-
     sendTripParams * p = (sendTripParams *)generic;
-    cout << "Calling Addtrip" << endl;
     p->dispatcher->addTrip(p->trip);
     delete p;
     return 0;
