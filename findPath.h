@@ -9,6 +9,7 @@
 #include <stack>
 #include <queue>
 #include <vector>
+#include <pthread.h>
 #include "GridMap.h"
 
 /**
@@ -27,8 +28,10 @@ public:
      * @param search the Grid to search
      * @param source the source point
      * @param destination the destination point
+     * @param lock the lock for multiple threads
      */
-    std::vector<Point>* bfsRoute(GridMap* search, Point source, Point destination);
+    std::vector<Point>* bfsRoute(GridMap* search, Point source,
+                                 Point destination);
 
     virtual ~findPath();
 };

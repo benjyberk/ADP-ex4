@@ -35,10 +35,10 @@ void TaxiDispatch::addDriver(Driver * newDriver, int tcp) {
     database[newDriver->getID()]->assignSocketNum(tcp);
 }
 
-void TaxiDispatch::sendTaxi(int id) {
+void TaxiDispatch::sendTaxi(int * refID) {
     //serialize the taxi
     string buffer;
-
+    int id = *refID;
     Serializer serializer;
     Taxi *taxiToSend = database[id]->getTaxi();
 
@@ -49,13 +49,27 @@ void TaxiDispatch::sendTaxi(int id) {
     tcp->sendData(send, database[id]->getSocketNum());
 }
 
-void TaxiDispatch::addTrip(TripInfo * newTrip) {
+void TaxiDispatch::addTrip(TripInfo * getTrip) {
+    cout << "Approaching lock" << endl;
+    pthread_mutex_lock(&lock);
+    cout << "Locked";
+
+    TripInfo * newTrip = getTrip;
+
     vector<Point> * r = router.bfsRoute(gridMap, newTrip->getStartPoint(), newTrip->getEndPoint());
     // The calculated route is assigned to the taxi
     newTrip->assignRoute(r);
-
+    cout << "Finished calculations" << endl;
     // We add the trip to the list of trips
     trips.push_back(newTrip);
+    Serializer s;
+    string a = s.serializeTrip(newTrip);
+    cout << a << endl;
+
+    cout << "Unlocking" << endl;
+    pthread_mutex_unlock(&lock);
+    //pthread_exit(0);
+    return;
 }
 
 Point *TaxiDispatch::getDriverLocation(int id) {
@@ -70,6 +84,10 @@ Point *TaxiDispatch::getDriverLocation(int id) {
 TaxiDispatch::TaxiDispatch(GridMap * grid, Clock newClock) {
     gridMap = grid;
     clock = newClock;
+
+    if (pthread_mutex_init(&lock, NULL) != 0) {
+        cout << "Mutex initialization failed" << endl;
+    }
 }
 
 TaxiDispatch::~TaxiDispatch() {
@@ -81,7 +99,7 @@ TaxiDispatch::~TaxiDispatch() {
         delete trips[i];
     }
 
-    for(taxi_driver_iterator iterator = database.begin(); iterator != database.end(); iterator++) {
+    for (taxi_driver_iterator iterator = database.begin(); iterator != database.end(); iterator++) {
         delete iterator->second;
     }
 }
@@ -148,7 +166,7 @@ void TaxiDispatch::closingOperations() {
     for(taxi_driver_iterator iterator = database.begin(); iterator != database.end(); iterator++) {
         if (iterator->second->driver != 0) {
             int id = iterator->second->taxi->getID();
-            tcp->sendData("X", database[id]->getSocketNum());
+            cout << "Sent closing data with result " << tcp->sendData("X", database[id]->getSocketNum()) << endl;
         }
     }
     delete tcp;

@@ -41,6 +41,7 @@ int main(int argc, char* argv[]) {
             case 7:
                 gc->closingOperations();
                 leaveLoop = true;
+                break;
             case 9:
                 gc->moveOneStep();
                 break;

@@ -28,7 +28,7 @@ protected:
     std::vector<Point> obstacles;
     std::vector<Point *> deleteLater;
 public:
-    GraphSquare* grid[10][10];
+    GraphSquare* grid[1000][1000];
     // The constructor method takes in the size required
     GridMap(int width, int height, std::vector<Point>);
     // Returns between 2-4 neighbours of a given point

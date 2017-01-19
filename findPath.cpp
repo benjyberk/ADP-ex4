@@ -6,8 +6,8 @@
 #include "findPath.h"
 using namespace std;
 
-
-vector<Point>* findPath::bfsRoute(GridMap* search, Point source, Point destination) {
+vector<Point>* findPath::bfsRoute(GridMap* search, Point source,
+                                  Point destination) {
     queue<GraphSquare*> nodes;
     GraphSquare* check;
     vector<GraphSquare *> adjacent;
@@ -68,6 +68,8 @@ vector<Point>* findPath::bfsRoute(GridMap* search, Point source, Point destinati
         }
     }
     search->reset();
+
+
     return reverseOrder;
 }
 

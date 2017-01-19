@@ -3,6 +3,7 @@
 // Advanced Programming 2016-2017 Bar Ilan
 //
 
+#include <pthread.h>
 #include <cstring>
 #include "GameControl.h"
 #include "LuxuryTaxi.h"
@@ -11,7 +12,6 @@
 #include "Udp.h"
 #include "Serializer.h"
 #include "Tcp.h"
-
 using namespace std;
 
 GameControl::GameControl() {
@@ -85,6 +85,7 @@ void GameControl::getGeneralInput() {
 void GameControl::addRide(string input) {
     int id, num_passengers, tariff, startTime;
     Point start, end;
+    pthread_t oneThread;
     vector<string> tokens = tokenizeByChar(input, ',');
 
     // The input is tokenized and parsed into Points
@@ -96,9 +97,19 @@ void GameControl::addRide(string input) {
     tariff = atoi(tokens[6].c_str());
     startTime = atoi(tokens[7].c_str());
 
-    // The trip is generated based on input
     TripInfo* t = new TripInfo(id, start, end, num_passengers, tariff, startTime);
-    dispatcher->addTrip(t);
+
+    sendTripParams * p = new sendTripParams;
+    p->trip = t;
+    p->dispatcher = dispatcher;
+
+    // The trip is generated based on input
+    cout << "creating thread" << endl;
+    if (pthread_create(&oneThread, NULL, tripCreationHelper, (void *) p) != 0) {
+        cout << "Error creating thread" << endl;
+    }
+
+    threadDB.push_back(oneThread);
 }
 
 void GameControl::printTaxiLocation(string input) {
@@ -110,7 +121,8 @@ void GameControl::printTaxiLocation(string input) {
 }
 
 void GameControl::addDriver(string input, char* argv[]) {
-    char buffer[2048];
+    vector<pthread_t> threadIDs;
+    char buffer[100000];
     Serializer serializer;
 
     //Create the socket to receive the driver
@@ -120,6 +132,7 @@ void GameControl::addDriver(string input, char* argv[]) {
 
     // Loop through all clients, receiving their info
     for(int i = 0; i < atoi(input.c_str()); i++){
+        pthread_t oneThread;
         tcp->acceptSock();
 
         //gets the driver from the client
@@ -131,8 +144,20 @@ void GameControl::addDriver(string input, char* argv[]) {
         Driver * d = serializer.deserializeDriver(receive);
         dispatcher->addDriver(d, tcp->upto - 1);
         cout << "sending taxi to client: " << i << endl;
-        dispatcher->sendTaxi(d->getID());
+
+        // Create the thread to communicate with client
+        int id = d->getID();
+        sendTaxiParams p;
+        p.id = &id;
+        p.dispatcher = dispatcher;
+
+        if (pthread_create(&oneThread, NULL, clientCreationHelper, (void *) &p) != 0) {
+            cout << "Error creating thread" << endl;
+        }
+
+        threadIDs.push_back(oneThread);
     }
+    finishInput(&threadIDs);
 }
 
 int GameControl::enumFromString(string raw, char type) {
@@ -213,7 +238,19 @@ GameControl::~GameControl() {
     }
 }
 
+void GameControl::finishInput(vector<pthread_t> * input) {
+    for (int i = 0; i < input->size(); i++) {
+        pthread_join(input->at(i), NULL);
+    }
+}
+
 void GameControl::moveOneStep() {
+    if(!threadDB.empty()){
+        for(int i = 0; i < threadDB.size(); ++i){
+            pthread_join(threadDB.at(i), NULL);
+        }
+        threadDB.clear();
+    }
     dispatcher->moveOneStep();
 }
 
@@ -221,3 +258,17 @@ void GameControl::closingOperations() {
     dispatcher->closingOperations();
 }
 
+void * GameControl::clientCreationHelper(void *generic) {
+    sendTaxiParams * p = (sendTaxiParams *)generic;
+    p->dispatcher->sendTaxi(p->id);
+    return 0;
+}
+
+void * GameControl::tripCreationHelper(void * generic) {
+
+    sendTripParams * p = (sendTripParams *)generic;
+    cout << "Calling Addtrip" << endl;
+    p->dispatcher->addTrip(p->trip);
+    delete p;
+    return 0;
+}

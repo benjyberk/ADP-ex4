@@ -21,7 +21,21 @@ private:
     GridMap * gridmap;
     TaxiDispatch * dispatcher;
     Clock clock;
+    vector<pthread_t> threadDB;
+    pthread_mutex_t lock;
 public:
+    // Used for threading to create a thread for every taxi
+    typedef struct params {
+        TaxiDispatch* dispatcher;
+        int * id;
+    } sendTaxiParams;
+
+    // Used for threading to create a thread for every input trip
+    typedef struct params2 {
+        TaxiDispatch* dispatcher;
+        TripInfo * trip;
+    } sendTripParams;
+
     // Converts the input string into the enumeration based on type
     int enumFromString(std::string raw, char type);
     // Tokenizes a string and returns the vector
@@ -41,6 +55,12 @@ public:
     void moveOneStep();
     // Close all sockets, release data
     void closingOperations();
+    // Finish getting driver inputs
+    void finishInput(vector<pthread_t> * input);
+    // Used for threading to create multiple clients
+    static void * clientCreationHelper(void *);
+    // Used for threading to create multiple trips
+    static void * tripCreationHelper(void *);
     ~GameControl();
 };
 

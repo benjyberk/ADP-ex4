@@ -38,6 +38,7 @@ private:
     findPath router;
     Clock clock;
     Tcp *tcp;
+    pthread_mutex_t lock;
 public:
     TaxiDispatch(GridMap *, Clock);
     void addTaxi(Taxi *);
@@ -47,7 +48,7 @@ public:
     // Moves all assigned taxis along their way
     void moveOneStep();
     Point * getDriverLocation(int id);
-    void sendTaxi(int id);
+    void sendTaxi(int * id);
     void sendTrip();
     void assignSocket(Tcp *tcp);
     ~TaxiDispatch();

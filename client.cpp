@@ -24,7 +24,8 @@ int main(int argc, char* argv[]) {
     Serializer serial;
     Taxi * taxi;
     TripInfo * trip;
-    char buffer[2048];
+    bool keepGoing = true;
+    char buffer[100000];
 
     // Get program input (a single driver)
     getline(cin, input);
@@ -49,6 +50,7 @@ int main(int argc, char* argv[]) {
     // Send the serialized driver
     cout << "Send status: " << tcp->sendData(send, 0) << endl;
     cout << "i, the client, sent a driver: " << send <<endl;
+
     // Receive the taxi
     tcp->reciveData(buffer, sizeof(buffer), 0);
     // Deserialize the taxi
@@ -58,7 +60,7 @@ int main(int argc, char* argv[]) {
 
 
 
-    while (true) {
+    while (keepGoing) {
         cout << "recived" << buffer << endl;
         // Wait to receive the trip stuff
         tcp->reciveData(buffer, sizeof(buffer), 0);
@@ -70,6 +72,7 @@ int main(int argc, char* argv[]) {
             // If, instead of receiving a trip, we receive an "end", end the program
             break;
         }
+
         receive = string(buffer);
         trip = serial.deserializeTrip(receive);
         cout << "our trip is: " << receive << endl;
@@ -85,6 +88,12 @@ int main(int argc, char* argv[]) {
             if (receive.compare(0,1,"M") == 0) {
                 cout << "Moving" << endl;
                 taxi->move();
+            }
+            if (receive.compare(0,1,"X") == 0) {
+                cout << "Ending" << endl;
+                keepGoing = false;
+                // If, instead of receiving a trip, we receive an "end", end the program
+                break;
             }
             a = *taxi->getLocation();
             b = trip->getEndPoint();
