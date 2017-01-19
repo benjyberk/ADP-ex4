@@ -52,7 +52,7 @@ void TaxiDispatch::sendTaxi(int * refID) {
 void TaxiDispatch::addTrip(TripInfo * getTrip) {
     cout << "Approaching lock" << endl;
     pthread_mutex_lock(&lock);
-    cout << "Locked";
+    cout << "Locked" << endl;
 
     TripInfo * newTrip = getTrip;
 
@@ -102,6 +102,8 @@ TaxiDispatch::~TaxiDispatch() {
     for (taxi_driver_iterator iterator = database.begin(); iterator != database.end(); iterator++) {
         delete iterator->second;
     }
+    // Destroy the mutex lock
+    pthread_mutex_destroy(&lock);
 }
 
 void TaxiDispatch::sendTrip() {
