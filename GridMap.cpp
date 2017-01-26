@@ -105,3 +105,7 @@ void GridMap::reset() {
         }
     }
 }
+
+Point GridMap::getDimensions() {
+    return Point(maxWidth, maxHeight);
+}

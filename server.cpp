@@ -13,6 +13,7 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
     string lineInput;
+    stringstream stream;
     int getChoice;
     bool leaveLoop = false;
     char dummy;
@@ -20,8 +21,14 @@ int main(int argc, char* argv[]) {
     gc->getGeneralInput();
 
     getline(cin, lineInput);
-    getChoice = atoi(lineInput.c_str());
+    stream << lineInput;
+    stream >> getChoice;
     while (!leaveLoop) {
+        // If we couldn't read in the stream or if there was more in the line then we fail
+        if (stream.fail() || stream.rdbuf()->in_avail() != 0) {
+            // If invalid input was received, go into case default
+            getChoice = 999;
+        }
         if (getChoice < 6) {
             getline(cin, lineInput);
         }
@@ -46,11 +53,16 @@ int main(int argc, char* argv[]) {
                 gc->moveOneStep();
                 break;
             default:
+                cout << -1 << endl;
                 break;
         }
         if (!leaveLoop) {
+            stream.str("");
+            stream.clear();
+
             getline(cin, lineInput);
-            getChoice = atoi(lineInput.c_str());
+            stream << lineInput;
+            stream >> getChoice;
         }
     }
 

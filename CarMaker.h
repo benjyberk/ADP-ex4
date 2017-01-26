@@ -7,7 +7,7 @@
 #define ADVANCED_EX2_CARMAKER_H
 
 enum CarMaker {
-    HONDA,
+    HONDA = 0,
     SUBARU,
     TESLA,
     FIAT

@@ -35,6 +35,8 @@ public:
     virtual std::vector<GraphSquare *> getNeighbours(Point);
     // Returns the pointer to the GraphSquare at a given x/y coordinate
     virtual GraphSquare * getNode(Point);
+    // Return the dimensions of the gridmap
+    Point getDimensions();
     // The destructor loops through the 2d array, deleting all elements.
     void reset();
     ~GridMap();

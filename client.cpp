@@ -18,12 +18,13 @@ int main(int argc, char* argv[]) {
     Clock clock;
     vector<string> tokens;
     GameControl gc;
-    int id, age, experience, vehicleID;
+    int convertedInts[5];
     MaritalStatus mStatus;
     string input, send, receive;
     Serializer serial;
     Taxi * taxi;
     TripInfo * trip;
+    stringstream str1;
     bool keepGoing = true;
     char buffer[100000];
 
@@ -32,14 +33,35 @@ int main(int argc, char* argv[]) {
     // Tokenize the input
     tokens = gc.tokenizeByChar(input, ',');
 
-    id = atoi(tokens[0].c_str());
-    age = atoi(tokens[1].c_str());
+    // Check that we have received enough input
+    if (tokens.size() != 5) {
+        return 0;
+    }
+
+    for (int i = 0; i < 4; i++) {
+        // We skip 2, as the validation is different for a MaritalStatus object
+        if (i == 2) { continue; }
+
+        str1 << tokens[i];
+        str1 >> convertedInts[i];
+
+        // Validate the ints
+        if (str1.fail() || convertedInts[i] < 0 || str1.rdbuf()->in_avail() != 0) {
+            return -1;
+        }
+        str1.clear();
+        str1.str("");
+    }
+
+    // Special error checking for the marital status
     mStatus = (MaritalStatus) gc.enumFromString(tokens[2], 'M');
-    experience = atoi(tokens[3].c_str());
-    vehicleID = atoi(tokens[4].c_str());
+    if ((int)mStatus == -1) {
+        return -1;
+    }
 
     // Generate the driver object
-    Driver * d = new Driver(id, age, mStatus, experience, vehicleID);
+    Driver * d = new Driver(convertedInts[0], convertedInts[1], mStatus, convertedInts[3],
+                            convertedInts[4]);
 
     // Serialize the driver
     send = serial.serializeDriver(d);

@@ -24,17 +24,32 @@ void GameControl::addTaxi(std::string input) {
     int id, type;
     CarMaker manufacturer;
     Color color;
-
+    Taxi * t;
+    stringstream str1,str2;
     // Parse and tokenize the input
     vector<string> tokens = tokenizeByChar(input, ',');
 
-    Taxi * t;
+    // Check to see the input was valid
+    if (tokens.size() != 4) {
+        cout << -1 << endl;
+        return;
+    }
 
     // We begin generating the input required to build our taxi
-    id = atoi(tokens[0].c_str());
-    type = atoi(tokens[1].c_str());
+    str1 << tokens[0];
+    str2 << tokens[1];
+    // Stringstreams are used for later validation
+    str1 >> id;
+    str2 >> type;
+
     manufacturer = (CarMaker)enumFromString(tokens[2], 'T');
     color = (Color)enumFromString(tokens[3], 'C');
+
+    if (manufacturer < 0 || color < 0 || str1.fail() || str2.fail() || !inRange(id, -1, 32767) ||
+            !inRange(type, 0, 3) || str1.rdbuf()->in_avail() != 0 || str2.rdbuf()->in_avail() != 0) {
+        cout << -1 << endl;
+        return;
+    }
 
     // The taxi is generated and added to the dispatcher
     if (type == 1) {
@@ -43,39 +58,107 @@ void GameControl::addTaxi(std::string input) {
         t = new LuxuryTaxi(id, manufacturer, color);
     }
     dispatcher->addTaxi(t);
+    cout << "Valid Taxi Submitted" << endl;
 }
 
 void GameControl::getGeneralInput() {
     Point dimensions;
     int numOfObstacles;
     string input;
-    char dummy;
+    int valid = 0;
+    int xParam, yParam;
+    vector<string> tokens;
+    stringstream str1, str2;
 
-    // We get the first line required for general input
-    getline(cin, input);
-    // The line is tokenized
-    vector<string> tokens = tokenizeByChar(input, ' ');
-
-    dimensions.x = atoi(tokens[0].c_str());
-    dimensions.y = atoi(tokens[1].c_str());
-
-    // The number of obstacles is tokenized
-    getline(cin, input);
-    tokens = tokenizeByChar(input, ' ');
-    numOfObstacles = atoi(input.c_str());
-
-    // We loop through, gathering the obstacles and adding them to a vector
-    for (int i = 0; i < numOfObstacles; i++) {
+    // Perform error checking
+    while (valid < 2) {
+        valid = 0;
+        // We get the first line required for general input
         getline(cin, input);
-        tokens = tokenizeByChar(input, ',');
-        Point temp;
+        // The line is tokenized
+        tokens = tokenizeByChar(input, ' ');
 
-        temp.x = atoi(tokens[0].c_str());
-        temp.y = atoi(tokens[1].c_str());
+        resetstreams(&str1, &str2);
 
-        obstacles.push_back(temp);
+        // Check to see if we have received enough tokens (sufficient input)
+        if (tokens.size() == 2) {
+            // Put the tokens in to stringstreams to check for non-digit characters
+            str1 << tokens[0];
+            str1 >> xParam;
+
+            str2 << tokens[1];
+            str2 >> yParam;
+            // Check to see that the values are valid
+            if ((!inRange(xParam, 0, 32767)) || (!inRange(yParam, 0, 32767))
+                || (str1.fail()) || (str2.fail())
+                || str1.rdbuf()->in_avail() != 0 || str2.rdbuf()->in_avail() != 0) {
+                // If we have invalid input, begin the loop again (dont set valid to true)
+                cout << -1 << endl;
+                continue;
+            } else {
+                // Otherwise, assign the parameters, set valid to true
+                dimensions.x = xParam;
+                dimensions.y = yParam;
+                valid++;
+            }
+        } else {
+            cout << -1 << endl;
+            continue;
+        }
+
+        resetstreams(&str1, &str2);
+
+        // The number of obstacles is tokenized
+        getline(cin, input);
+        str1 << input;
+        str1 >> numOfObstacles;
+        tokens = tokenizeByChar(input, ' ');
+        if (str1.fail() || !inRange(numOfObstacles, -1, xParam * yParam) || tokens.size() > 1
+                || str1.rdbuf()->in_avail() != 0) {
+            cout << -1 << endl;
+            continue;
+        }
+        else {
+            valid++;
+        }
+
+        // We loop through, gathering the obstacles and adding them to a vector
+        for (int i = 0; i < numOfObstacles; i++) {
+            resetstreams(&str1, &str2);
+            getline(cin, input);
+            tokens = tokenizeByChar(input, ',');
+            Point temp;
+
+            // Validate that enough tokens have been input
+            if (tokens.size() != 2) {
+                cout << -1 << endl;
+                valid = 0;
+                obstacles.clear();
+                break;
+            }
+
+            // Put the tokens into the stringstream for validation checking
+            str1 << tokens[0];
+            str2 << tokens[1];
+
+            str1 >> temp.x;
+            str2 >> temp.y;
+
+            // If the input is not a number, or is not in the valid range, we print -1 and restart
+            if (str1.fail() || str2.fail() || !inRange(temp.x, -1, dimensions.x) ||
+                    !inRange(temp.y, -1, dimensions.y)
+                || str1.rdbuf()->in_avail() != 0 || str2.rdbuf()->in_avail() != 0) {
+                cout << -1 << endl;
+                valid = 0;
+                obstacles.clear();
+                break;
+            }
+
+            obstacles.push_back(temp);
+        }
     }
 
+    cout << "Passed stage 1" << endl;
     // The obstacles are put in the gridmap
     gridmap = new GridMap(dimensions.x, dimensions.y, obstacles);
     // The gridmap is used by the dispatcher
@@ -83,21 +166,64 @@ void GameControl::getGeneralInput() {
 }
 
 void GameControl::addRide(string input) {
-    int id, num_passengers, tariff, startTime;
-    Point start, end;
+    int id, num_passengers, tariff, startTime, x, y;
+    int convertedInts[4];
+    Point tripPoints[2];
+    Point dims;
+    stringstream str1, str2;
     pthread_t oneThread;
+
     vector<string> tokens = tokenizeByChar(input, ',');
+    if (tokens.size() != 8) {
+        cout << -1 << endl;
+        return;
+    }
 
-    // The input is tokenized and parsed into Points
-    start = Point(atoi(tokens[1].c_str()), atoi(tokens[2].c_str()));
-    end = Point(atoi(tokens[3].c_str()), atoi(tokens[4].c_str()));
+    dims = gridmap->getDimensions();
+    x = y = 0;
+    for (int i = 0; i < 4; i+= 2) {
+        // The input is tokenized and parsed into Points
+        str1 << tokens[i+1];
+        str2 << tokens[i+2];
 
-    id = atoi(tokens[0].c_str());
-    num_passengers = atoi(tokens[5].c_str());
-    tariff = atoi(tokens[6].c_str());
-    startTime = atoi(tokens[7].c_str());
+        str1 >> x;
+        str2 >> y;
 
-    TripInfo* t = new TripInfo(id, start, end, num_passengers, tariff, startTime);
+        // Validation for the Point
+        if (str1.fail() || str2.fail() || !inRange(x, -1, dims.x) || !inRange(y, -1, dims.y)
+            || str1.rdbuf()->in_avail() != 0 || str2.rdbuf()->in_avail() != 0) {
+            cout << -1 << endl;
+            return;
+        }
+        // This will only result in positions 0 and 1, because the loop only runs twice
+        tripPoints[i / 2] = Point(x, y);
+        resetstreams(&str1, &str2);
+    }
+
+    // We overwrite position 4 in the array of tokens for ease of looping:
+    tokens[4] = tokens[0];
+    for (int i = 0; i < 4; i++) {
+        str1 << tokens[i + 4];
+        str1 >> convertedInts[i];
+
+        // Validation on the int
+        if (str1.fail() || !inRange(convertedInts[i], -1, 32767) || str1.rdbuf()->in_avail() != 0) {
+            cout << -1 << endl;
+            return;
+        }
+
+        str1.str("");
+        str1.clear();
+    }
+
+    // An addition check is performed on the start-time, as it cannot be equal to 0
+    if (convertedInts[3] == 0) {
+        cout << -1 << endl;
+        return;
+    }
+
+    TripInfo* t = new TripInfo(convertedInts[0], tripPoints[0], tripPoints[1], convertedInts[1],
+                               convertedInts[2], convertedInts[3]);
 
     sendTripParams * p = new sendTripParams;
     p->trip = t;
@@ -175,6 +301,9 @@ int GameControl::enumFromString(string raw, char type) {
             else if (!raw.compare("W")) {
                 returnVal = WIDOWED;
             }
+            else {
+                returnVal = -1;
+            }
             break;
         case 'C':
             if (!raw.compare("R")) {
@@ -192,6 +321,9 @@ int GameControl::enumFromString(string raw, char type) {
             else if (!raw.compare("W")) {
                 returnVal = WHITE;
             }
+            else {
+                returnVal = -1;
+            }
             break;
         case 'T':
             if (!raw.compare("H")) {
@@ -206,9 +338,12 @@ int GameControl::enumFromString(string raw, char type) {
             else if (!raw.compare("F")) {
                 returnVal = FIAT;
             }
+            else {
+                returnVal = -1;
+            }
             break;
         default:
-            returnVal = 0;
+            returnVal = -1;
             break;
     }
     return returnVal;
@@ -267,4 +402,15 @@ void * GameControl::tripCreationHelper(void * generic) {
     p->dispatcher->addTrip(p->trip);
     delete p;
     return 0;
+}
+
+bool GameControl::inRange(int check, int lowerBound, int upperBound) {
+    return (check < upperBound) && (check > lowerBound);
+}
+
+void GameControl::resetstreams(stringstream *a, stringstream *b) {
+    a->str("");
+    a->clear();
+    b->str("");
+    b->clear();
 }

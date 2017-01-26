@@ -61,6 +61,9 @@ public:
     static void * clientCreationHelper(void *);
     // Used for threading to create multiple trips
     static void * tripCreationHelper(void *);
+    // Check if a number is in a given range
+    bool inRange(int check, int lowerBound, int upperBound);
+    void resetstreams(stringstream *a, stringstream *b);
     ~GameControl();
 };
 

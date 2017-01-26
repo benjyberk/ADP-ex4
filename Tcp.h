@@ -24,7 +24,7 @@ public:
 	Tcp(bool isServers, int port_num, string ip);
 	/***********************************************************************
 	* function name: ~Tcp												   *
-	* The Input: none													   *
+	* The Input: none.													   *
 	* The output: none										               *
 	* The Function operation: default destructor					       *
 	***********************************************************************/

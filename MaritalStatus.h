@@ -7,7 +7,7 @@
 #define ADVANCED_EX2_MARITALSTATUS_H
 
     enum MaritalStatus {
-        SINGLE,
+        SINGLE = 0,
         MARRIED,
         DIVORCED,
         WIDOWED,

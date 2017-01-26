@@ -7,7 +7,7 @@
 #define ADVANCED_EX2_COLOR_H
 
 enum Color {
-    RED,
+    RED = 0,
     BLUE,
     GREEN,
     PINK,
