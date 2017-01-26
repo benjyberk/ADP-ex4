@@ -17,6 +17,7 @@ using namespace std;
 GameControl::GameControl() {
     gridmap = 0;
     dispatcher = 0;
+    threadPool = new ThreadPool(5);
 }
 
 
@@ -165,7 +166,7 @@ void GameControl::getGeneralInput() {
     dispatcher = new TaxiDispatch(gridmap, clock);
 }
 
-void GameControl::addRide(string input) {
+void GameControl::addTrip(string input) {
     int id, num_passengers, tariff, startTime, x, y;
     int convertedInts[4];
     Point tripPoints[2];
@@ -229,13 +230,8 @@ void GameControl::addRide(string input) {
     p->trip = t;
     p->dispatcher = dispatcher;
 
-    // The trip is generated based on input
-    // We create a thread to handle the processing of the trip
-    if (pthread_create(&oneThread, NULL, tripCreationHelper, (void *) p) != 0) {
-        //"Error creating thread";
-    }
-    // We add our thread id to the list for later 'joining' when necessary
-    threadDB.push_back(oneThread);
+    Task *t1 = new Task(tripCreationHelper ,(void *)&p);
+    threadPool->add_task(t1);
 }
 
 void GameControl::printTaxiLocation(string input) {
@@ -275,7 +271,8 @@ void GameControl::addDriver(string input, char* argv[]) {
         p.id = &id;
         p.dispatcher = dispatcher;
 
-        if (pthread_create(&oneThread, NULL, clientCreationHelper, (void *) &p) != 0) {
+        if (pthread_create(&oneThread, NULL, clientCreationHelper, (void *) &p) != 0)
+        {
             //"Error creating thread";
         }
         // Add the thread to our list for later joining
@@ -378,11 +375,11 @@ void GameControl::finishInput(vector<pthread_t> * input) {
 }
 
 void GameControl::moveOneStep() {
-    if(!threadDB.empty()){
-        for(int i = 0; i < threadDB.size(); ++i){
-            pthread_join(threadDB.at(i), NULL);
-        }
-        threadDB.clear();
+    //if it's not the first time we go into this function, after deleting the threadpool, assign it to zeor
+    if (threadPool != 0)
+    {
+        delete threadPool;
+        threadPool = 0;
     }
     dispatcher->moveOneStep();
 }

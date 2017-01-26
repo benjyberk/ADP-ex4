@@ -10,6 +10,7 @@
 #include <map>
 #include "TaxiDispatch.h"
 #include "Clock.h"
+#include "ThreadPool.h"
 
 /**
  * The Game Control class handles all input and directs the creation
@@ -21,8 +22,8 @@ private:
     GridMap * gridmap;
     TaxiDispatch * dispatcher;
     Clock clock;
-    vector<pthread_t> threadDB;
     pthread_mutex_t lock;
+    ThreadPool *threadPool;
 public:
     // Used for threading to create a thread for every taxi
     typedef struct params {
@@ -48,7 +49,7 @@ public:
     // Parses the dimensions of the game, creates the gridmap and obstacles elements
     void getGeneralInput();
     // Adds a new trip to the taxi dispatcher
-    void addRide(std::string);
+    void addTrip(std::string);
     // Outputs the location of a taxi
     void printTaxiLocation(std::string);
     // Moves all taxis assigned on trips

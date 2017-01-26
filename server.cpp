@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
                 gc->addDriver(lineInput, argv);
                 break;
             case 2:
-                gc->addRide(lineInput);
+                gc->addTrip(lineInput);
                 break;
             case 3:
                 gc->addTaxi(lineInput);
