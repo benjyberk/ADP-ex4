@@ -14,6 +14,7 @@ TripInfo::TripInfo(int r_id, Point r_sPoint, Point r_dPoint, int r_numPass, int 
     numPassengers = r_numPass;
     tarrif = r_tar;
     startTime = sTime;
+    route = 0;
 }
 
 TripInfo::TripInfo() {
@@ -23,6 +24,7 @@ TripInfo::TripInfo() {
     numPassengers = 0;
     tarrif = 0;
     startTime = -1;
+    route = 0;
 }
 
 

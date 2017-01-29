@@ -51,6 +51,7 @@ public:
     void sendTaxi(int * id);
     void sendTrip();
     void assignSocket(Tcp *tcp);
+    int pendingTrips;
     ~TaxiDispatch();
 };
 

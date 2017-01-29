@@ -57,28 +57,24 @@ vector<GraphSquare *> GridMap::getNeighbours(Point find) {
         adjacent.push_back(grid[xpos][ypos - 1]);
     }
 
+    // For the adjacency list we have made, we check to see that no obstacles are part of it
     for (int i = 0; i < adjacent.size(); i++) {
         int found = 0;
         for (int j = 0; j < obstacles.size(); j++) {
-
-            Point a = *(adjacent[i]->gridLocation);
-            Point b = obstacles[j];
-            if (a == b) {
+            // Check to see if the iTH adjacent point is an obstacle
+            if (*(adjacent[i]->gridLocation) == obstacles[j]) {
                 found = 1;
                 break;
             }
+
         }
+        // If we found a match, we remove it from the list (it is an obstacle and not valid)
         if (found) {
-            cout << "About to erase " << adjacent[i]->gridLocation->toString() << endl;
             adjacent.erase(adjacent.begin() + i);
             i--;
         }
     }
-    cout << "Adjacents: ";
-    for (int i = 0; i < adjacent.size(); i++) {
-        cout << adjacent[i]->gridLocation->toString() << " ";
-    }
-    cout << endl;
+
     // The constructed array is returned
     return adjacent;
 }

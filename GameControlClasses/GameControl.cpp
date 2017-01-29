@@ -58,7 +58,6 @@ void GameControl::addTaxi(std::string input) {
         t = new LuxuryTaxi(id, manufacturer, color);
     }
     dispatcher->addTaxi(t);
-    cout << "Valid Taxi Submitted" << endl;
 }
 
 void GameControl::getGeneralInput() {
@@ -159,11 +158,9 @@ void GameControl::getGeneralInput() {
         }
     }
 
-    cout << "Passed stage 1" << endl;
     // The obstacles are put in the gridmap
     gridmap = new GridMap(dimensions.x, dimensions.y, obstacles);
     // The gridmap is used by the dispatcher
-    cout << "Gridmap is" << gridmap << endl;
     dispatcher = new TaxiDispatch(gridmap, clock);
 }
 
@@ -223,6 +220,9 @@ void GameControl::addTrip(string input) {
         cout << -1 << endl;
         return;
     }
+
+    // We inform the dispatcher that it will have a new trip to process
+    dispatcher->pendingTrips++;
 
     TripInfo* t = new TripInfo(convertedInts[0], tripPoints[0], tripPoints[1], convertedInts[1],
                                convertedInts[2], convertedInts[3]);
@@ -392,16 +392,12 @@ void GameControl::finishInput(vector<pthread_t> * input) {
 }
 
 void GameControl::moveOneStep() {
-    //if it's not the first time we go into this function, after deleting the threadpool, assign it to zeor
-    if (threadPool != 0)
-    {
-        delete threadPool;
-        threadPool = 0;
-    }
     dispatcher->moveOneStep();
 }
 
 void GameControl::closingOperations() {
+    delete threadPool;
+
     dispatcher->closingOperations();
 }
 

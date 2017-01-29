@@ -55,7 +55,6 @@ vector<Point>* FindPath::bfsRoute(GridMap* search, Point source,
     // In that case we return an 'empty' path back.
     Point checkNoPath = Point(-1,-1);
     if (check->predecessor == checkNoPath) {
-        cout << "No path possible" << endl;
         reverseOrder->emplace_back(checkNoPath);
         // We reset the grid for next use
         search->reset();

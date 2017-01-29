@@ -3,6 +3,7 @@
 // Advanced Programming 2016-2017 Bar Ilan
 //
 
+#include <unistd.h>
 #include "TaxiDispatch.h"
 #include "../MapClasses/FindPath.h"
 #include "../GameControlClasses/Serializer.h"
@@ -51,11 +52,9 @@ void TaxiDispatch::sendTaxi(int * refID) {
 
 void TaxiDispatch::addTrip(TripInfo * getTrip) {
     // We lock the thread to avoid race conditions (for the bfsRouting algorithm)
-    cout << "Approaching lock" << endl;
     pthread_mutex_lock(&lock);
-    cout << "Locked" << endl;
     TripInfo * newTrip = getTrip;
-    cout << "Gridmap value: " << gridMap << endl;
+
     // We calculate the route for the taxi to take
     vector<Point> * r = router.bfsRoute(gridMap, newTrip->getStartPoint(), newTrip->getEndPoint());
 
@@ -74,8 +73,9 @@ void TaxiDispatch::addTrip(TripInfo * getTrip) {
         delete getTrip;
     }
 
+    // We inform the main thread that another trip has been processed
+    pendingTrips--;
     // The thread is finished and thus unlocks
-    cout << "Unlocking" << endl;
     pthread_mutex_unlock(&lock);
     return;
 }
@@ -94,6 +94,7 @@ Point *TaxiDispatch::getDriverLocation(int id) {
 TaxiDispatch::TaxiDispatch(GridMap * grid, Clock newClock) {
     gridMap = grid;
     clock = newClock;
+    pendingTrips = 0;
 
     if (pthread_mutex_init(&lock, NULL) != 0) {
         //"Mutex initialization failed"
@@ -128,15 +129,19 @@ void TaxiDispatch::moveOneStep() {
     Serializer serializer;
     string buffer;
 
-
-
-    // First we move any taxis that need to be moved
+    // First we move any taxis that need to be moved along their assigned paths
     for(taxi_driver_iterator iterator = database.begin(); iterator != database.end(); iterator++) {
         if (iterator->second->taxi->isAssigned) {
             int id = iterator->second->taxi->getID();
             iterator->second->taxi->move();
             tcp->sendData("M", database[id]->getSocketNum());
         }
+    }
+
+    // We wait for any processing to be done on trips that are pending (essentially performing
+    // a pthread_join operation except threadpool styled.
+    while (pendingTrips != 0) {
+        sleep(1);
     }
 
     // Now we assign any new trips that need to be assigned
@@ -154,10 +159,12 @@ void TaxiDispatch::moveOneStep() {
                 if (a == b) {
 
                     int foundID = foundListener->id;
+
                     // We assign the trip to the taxi
                     database[foundID]->taxi->assignTrip(*current);
                     listeners.erase(listeners.begin() + j);
                     listeners.push_back(foundListener);
+
                     // We send the client info on the assigned taxi
                     buffer = serializer.serializeTrip(current);
                     tcp->sendData(buffer, database[foundID]->getSocketNum());

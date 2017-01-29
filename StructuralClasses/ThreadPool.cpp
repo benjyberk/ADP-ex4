@@ -14,6 +14,7 @@ ThreadPool::ThreadPool(int pool_size)
         //"Mutex initialization failed"
     }
 
+    // Initialization for all threads, sends them to the start_thread method
     for (int i = 0; i < m_pool_size; i++) {
         pthread_t tid;
         int ret = pthread_create(&tid, NULL, start_thread, (void*) this);
@@ -23,43 +24,43 @@ ThreadPool::ThreadPool(int pool_size)
         }
         m_threads.push_back(tid);
     }
-    cout << m_pool_size << " threads created by the thread pool" << endl;
 }
 
 ThreadPool::~ThreadPool()
 {
+    // Setting stop to true removes all threads from their endless 'wait' loops
     stop = true;
     for (int i = 0; i < m_pool_size; i++)
     {
 
         pthread_join(m_threads[i], NULL);
     }
-    cout << "Destroying task lock" << endl;
     pthread_mutex_destroy(&taskLock);
-    cout << m_pool_size << " threads exited from the thread pool" << endl;
 }
 
 void* ThreadPool::execute_thread()
 {
     Task* task = NULL;
+    // The overall running loop only terminates when given the signal (by the destructor)
     while(stop == false) {
+        // While there are no tasks to do, the threads wait in an endless loop
         while (m_tasks.empty() && stop == false)
         {
             sleep(1);
         }
+        // We Lock, to make sure only one thread gets one task at a time
         pthread_mutex_lock(&taskLock);
-        cout << "Locked Task" << endl;
         if (!m_tasks.empty()) {
-            cout << "Doing Task" << endl;
+            // Assigns the first task in line to the thread
             task = m_tasks.front();
             m_tasks.pop_front();
-            cout << "Unlocking Task" << endl;
+            // Any other threads released can now get assigned the next task
             pthread_mutex_unlock(&taskLock);
             (*task)();
         }
         else {
-            cout << "Returning to sleep" << endl;
-            cout << "Unlocking Task" << endl;
+            // If a thread was released from the endless loop simultaneously with the correct thread
+            // It simply goes back to 'sleep'
             pthread_mutex_unlock(&taskLock);
         }
     }
