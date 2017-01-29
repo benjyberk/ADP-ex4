@@ -50,6 +50,7 @@ int main(int argc, char* argv[]) {
             // If anything is invalid, we crash the client
             return 0;
         }
+        // Clear the stringstream for next round
         str1.clear();
         str1.str("");
     }

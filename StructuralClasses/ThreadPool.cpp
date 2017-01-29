@@ -32,8 +32,11 @@ ThreadPool::~ThreadPool()
     stop = true;
     for (int i = 0; i < m_pool_size; i++)
     {
-
         pthread_join(m_threads[i], NULL);
+    }
+    while (!m_tasks.empty()) {
+        delete m_tasks.front();
+        m_tasks.pop_front();
     }
     pthread_mutex_destroy(&taskLock);
 }
@@ -57,6 +60,9 @@ void* ThreadPool::execute_thread()
             // Any other threads released can now get assigned the next task
             pthread_mutex_unlock(&taskLock);
             (*task)();
+
+            // After the task is completed, it may be deleted
+            delete task;
         }
         else {
             // If a thread was released from the endless loop simultaneously with the correct thread
