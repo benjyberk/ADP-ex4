@@ -8,7 +8,7 @@
 
 class TaxiDispatch;
 
-#include "Point.h"
+#include "../MapClasses/Point.h"
 #include "Taxi.h"
 #include "TaxiDispatch.h"
 

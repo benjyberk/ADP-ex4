@@ -23,6 +23,7 @@ GridMap::GridMap(int width, int height, vector<Point> inputObstacles) {
             Point* tempPoint = new Point(i, height - j - 1);
             GraphSquare* tempGraphSquare = new GraphSquare(tempPoint);
             tempGraphSquare->distanceFromSource = -1;
+            tempGraphSquare->predecessor = Point(-1,-1);
             grid[i][height - j - 1] = tempGraphSquare;
         }
     }
@@ -68,10 +69,16 @@ vector<GraphSquare *> GridMap::getNeighbours(Point find) {
             }
         }
         if (found) {
+            cout << "About to erase " << adjacent[i]->gridLocation->toString() << endl;
             adjacent.erase(adjacent.begin() + i);
+            i--;
         }
     }
-
+    cout << "Adjacents: ";
+    for (int i = 0; i < adjacent.size(); i++) {
+        cout << adjacent[i]->gridLocation->toString() << " ";
+    }
+    cout << endl;
     // The constructed array is returned
     return adjacent;
 }
@@ -101,6 +108,7 @@ void GridMap::reset() {
     for (int i = 0; i < maxWidth; i++) {
         for (int j = 0; j < maxHeight; j++) {
             grid[i][maxHeight - j - 1]->distanceFromSource = -1;
+            grid[i][maxHeight - j - 1]->predecessor = Point(-1,-1);
             //grid[i][maxHeight - j - 1]->predecessor = 0;
         }
     }

@@ -17,11 +17,11 @@ class DriverTaxiContainer;
 #include "Taxi.h"
 #include "TripInfo.h"
 #include "DriverLocationListener.h"
-#include "GridMap.h"
-#include "findPath.h"
+#include "../MapClasses/GridMap.h"
+#include "../MapClasses/FindPath.h"
 #include "Clock.h"
-#include "Socket.h"
-#include "Tcp.h"
+#include "../StructuralClasses/Socket.h"
+#include "../StructuralClasses/Tcp.h"
 
 /**
  * The TaxiDispatcher holds all trip orders as well as taxis, drivers
@@ -35,7 +35,7 @@ private:
     std::deque<TripInfo *> trips;
     std::vector<DriverLocationListener *> listeners;
     GridMap * gridMap;
-    findPath router;
+    FindPath router;
     Clock clock;
     Tcp *tcp;
     pthread_mutex_t lock;

@@ -6,18 +6,17 @@
 #include <pthread.h>
 #include <cstring>
 #include "GameControl.h"
-#include "LuxuryTaxi.h"
-#include "StandardTaxi.h"
-#include "Socket.h"
-#include "Udp.h"
+#include "../DriverTaxiClasses/LuxuryTaxi.h"
+#include "../DriverTaxiClasses/StandardTaxi.h"
+#include "../StructuralClasses/Socket.h"
+#include "../StructuralClasses/Udp.h"
 #include "Serializer.h"
-#include "Tcp.h"
+#include "../StructuralClasses/Tcp.h"
 using namespace std;
 
 GameControl::GameControl() {
     gridmap = 0;
     dispatcher = 0;
-    threadPool = new ThreadPool(5);
 }
 
 
@@ -70,6 +69,7 @@ void GameControl::getGeneralInput() {
     int xParam, yParam;
     vector<string> tokens;
     stringstream str1, str2;
+    threadPool = new ThreadPool(5);
 
     // Perform error checking
     while (valid < 2) {
@@ -163,6 +163,7 @@ void GameControl::getGeneralInput() {
     // The obstacles are put in the gridmap
     gridmap = new GridMap(dimensions.x, dimensions.y, obstacles);
     // The gridmap is used by the dispatcher
+    cout << "Gridmap is" << gridmap << endl;
     dispatcher = new TaxiDispatch(gridmap, clock);
 }
 
@@ -230,16 +231,32 @@ void GameControl::addTrip(string input) {
     p->trip = t;
     p->dispatcher = dispatcher;
 
-    Task *t1 = new Task(tripCreationHelper ,(void *)&p);
+    Task *t1 = new Task(tripCreationHelper ,(void *)p);
     threadPool->add_task(t1);
 }
 
 void GameControl::printTaxiLocation(string input) {
+    stringstream str1;
+    int id;
+    Point failPoint = Point(-1,-1);
     // Parses the input and prints the taxi location from the dispatcher
     vector<string> tokens = tokenizeByChar(input, ',');
-    int id = atoi(tokens[0].c_str());
+    str1 << tokens[0];
+    str1 >> id;
+
+    // Data Validation
+    if (str1.fail() || str1.rdbuf()->in_avail() != 0 || !inRange(id, -1, 32676)) {
+        cout << -1 << endl;
+    }
+
     Point * location = dispatcher->getDriverLocation(id);
-    cout << location->toString() << endl;
+    // Check to see if the dispatcher was able to find the id requested
+    if (location != 0) {
+        cout << location->toString() << endl;
+    }
+    else {
+        cout << -1 << endl;
+    }
 }
 
 void GameControl::addDriver(string input, char* argv[]) {

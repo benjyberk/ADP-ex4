@@ -18,7 +18,7 @@
  * the neighbours of any given point.  However the GridMap MUST be comprised of gridsquare (or
  * any inheritor that also contains the necessary fields).LL
  */
-class findPath {
+class FindPath {
 private:
     std::vector<Point *> cleanup;
 public:
@@ -33,7 +33,7 @@ public:
     std::vector<Point>* bfsRoute(GridMap* search, Point source,
                                  Point destination);
 
-    virtual ~findPath();
+    virtual ~FindPath();
 };
 
 

@@ -3,10 +3,10 @@
 // Advanced Programming 2016-2017 Bar Ilan
 //
 
-#include "findPath.h"
+#include "FindPath.h"
 using namespace std;
 
-vector<Point>* findPath::bfsRoute(GridMap* search, Point source,
+vector<Point>* FindPath::bfsRoute(GridMap* search, Point source,
                                   Point destination) {
     queue<GraphSquare*> nodes;
     GraphSquare* check;
@@ -50,6 +50,18 @@ vector<Point>* findPath::bfsRoute(GridMap* search, Point source,
     // so we use a stack (FILO).
     vector<Point> * reverseOrder = new vector<Point>;
     check = search->getNode(destination);
+
+    // If no path was possible, then the 'destination' node will not have a predecessor node.
+    // In that case we return an 'empty' path back.
+    Point checkNoPath = Point(-1,-1);
+    if (check->predecessor == checkNoPath) {
+        cout << "No path possible" << endl;
+        reverseOrder->emplace_back(checkNoPath);
+        // We reset the grid for next use
+        search->reset();
+        return reverseOrder;
+    }
+
     found = false;
     // We follow the trail back from the source to the destination using the 'predecessor' member.
     while (!found) {
@@ -67,13 +79,14 @@ vector<Point>* findPath::bfsRoute(GridMap* search, Point source,
             check = search->getNode(check->predecessor);
         }
     }
+    // After the valid path has been found, we reset the gridmap for the next use
     search->reset();
 
-
+    // We return the calculated path
     return reverseOrder;
 }
 
-findPath::~findPath() {
+FindPath::~FindPath() {
     for (int i = 0; i < cleanup.size(); i++) {
         delete cleanup[i];
     }

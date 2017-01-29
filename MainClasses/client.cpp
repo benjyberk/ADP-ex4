@@ -3,14 +3,14 @@
 // Advanced Programming 2016-2017 Bar Ilan
 //
 
-#include "Driver.h"
-#include "Serializer.h"
-#include "StandardTaxi.h"
-#include "LuxuryTaxi.h"
-#include "GameControl.h"
-#include "Socket.h"
-#include "Udp.h"
-#include "Tcp.h"
+#include "../DriverTaxiClasses/Driver.h"
+#include "../GameControlClasses/Serializer.h"
+#include "../DriverTaxiClasses/StandardTaxi.h"
+#include "../DriverTaxiClasses/LuxuryTaxi.h"
+#include "../GameControlClasses/GameControl.h"
+#include "../StructuralClasses/Socket.h"
+#include "../StructuralClasses/Udp.h"
+#include "../StructuralClasses/Tcp.h"
 
 using namespace std;
 

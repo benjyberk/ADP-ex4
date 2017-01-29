@@ -4,9 +4,9 @@
 //
 
 #include "TaxiDispatch.h"
-#include "findPath.h"
-#include "Serializer.h"
-#include "Tcp.h"
+#include "../MapClasses/FindPath.h"
+#include "../GameControlClasses/Serializer.h"
+#include "../StructuralClasses/Tcp.h"
 
 using namespace std;
 
@@ -51,18 +51,31 @@ void TaxiDispatch::sendTaxi(int * refID) {
 
 void TaxiDispatch::addTrip(TripInfo * getTrip) {
     // We lock the thread to avoid race conditions (for the bfsRouting algorithm)
+    cout << "Approaching lock" << endl;
     pthread_mutex_lock(&lock);
-
+    cout << "Locked" << endl;
     TripInfo * newTrip = getTrip;
-
+    cout << "Gridmap value: " << gridMap << endl;
+    // We calculate the route for the taxi to take
     vector<Point> * r = router.bfsRoute(gridMap, newTrip->getStartPoint(), newTrip->getEndPoint());
-    // The calculated route is assigned to the taxi
-    newTrip->assignRoute(r);
 
-    // We add the trip to the list of trips
-    trips.push_back(newTrip);
+    // If the route is 'unpathable' we stop the process here (the trip isn't entered)
+    Point empty = Point(-1,-1);
+    if (r->at(0) != empty) {
+        // Otherwise the calculated route is assigned to the taxi
+        newTrip->assignRoute(r);
+
+        // We add the trip to the list of trips
+        trips.push_back(newTrip);
+    }
+    else {
+        // If the route is un-pathable we free allocated memory
+        delete r;
+        delete getTrip;
+    }
 
     // The thread is finished and thus unlocks
+    cout << "Unlocking" << endl;
     pthread_mutex_unlock(&lock);
     return;
 }
@@ -74,6 +87,8 @@ Point *TaxiDispatch::getDriverLocation(int id) {
             return listeners[i]->getLocation();
         }
     }
+    // If we got to this point, the requested ID was not present, thus we return an error
+    return 0;
 }
 
 TaxiDispatch::TaxiDispatch(GridMap * grid, Clock newClock) {
