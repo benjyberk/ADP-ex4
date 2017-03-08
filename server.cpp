@@ -12,12 +12,17 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
+
+    //create new socket for the server to communicate
+    Tcp * tcp = new Tcp(1, atoi(argv[1]), "127.0.0.1");
+    tcp->initialize();
+
     string lineInput;
     stringstream stream;
     int getChoice;
     bool leaveLoop = false;
     char dummy;
-    GameControl * gc = new GameControl();
+    GameControl * gc = new GameControl(tcp);
     gc->getGeneralInput();
 
     getline(cin, lineInput);
@@ -34,7 +39,7 @@ int main(int argc, char* argv[]) {
         }
         switch (getChoice) {
             case 1:
-                gc->addDriver(lineInput, argv);
+                gc->addDriver(lineInput);
                 break;
             case 2:
                 gc->addTrip(lineInput);
@@ -67,6 +72,6 @@ int main(int argc, char* argv[]) {
     }
 
     delete gc;
-
+    delete tcp;
     return 0;
 }

@@ -14,10 +14,11 @@
 #include "Tcp.h"
 using namespace std;
 
-GameControl::GameControl() {
+GameControl::GameControl(Tcp *sock) {
     gridmap = 0;
     dispatcher = 0;
     threadPool = new ThreadPool(5);
+    socket = sock;
 }
 
 
@@ -164,6 +165,7 @@ void GameControl::getGeneralInput() {
     gridmap = new GridMap(dimensions.x, dimensions.y, obstacles);
     // The gridmap is used by the dispatcher
     dispatcher = new TaxiDispatch(gridmap, clock);
+    dispatcher->assignSocket(socket);
 }
 
 void GameControl::addTrip(string input) {
@@ -242,28 +244,23 @@ void GameControl::printTaxiLocation(string input) {
     cout << location->toString() << endl;
 }
 
-void GameControl::addDriver(string input, char* argv[]) {
+void GameControl::addDriver(string input) {
     vector<pthread_t> threadIDs;
     char buffer[100000];
     Serializer serializer;
 
-    //Create the socket to receive the driver
-    Tcp * tcp = new Tcp(1, atoi(argv[1]), "127.0.0.1");
-    tcp->initialize();
-    dispatcher->assignSocket(tcp);
-
     // Loop through all clients, receiving their info
     for(int i = 0; i < atoi(input.c_str()); i++){
         pthread_t oneThread;
-        tcp->acceptSock();
+        socket->acceptSock();
 
         //Gets the driver from the client using the socket based on what the tcp socket is up to
-        tcp->reciveData(buffer, sizeof(buffer), tcp->upto - 1);
+        socket->reciveData(buffer, sizeof(buffer), socket->upto - 1);
         string receive(buffer);
 
         //deserialize the driver from client
         Driver * d = serializer.deserializeDriver(receive);
-        dispatcher->addDriver(d, tcp->upto - 1);
+        dispatcher->addDriver(d, socket->upto - 1);
 
         // Create the thread to communicate with client (to send back the taxi)
         int id = d->getID();

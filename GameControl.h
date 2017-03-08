@@ -24,6 +24,7 @@ private:
     Clock clock;
     pthread_mutex_t lock;
     ThreadPool *threadPool;
+    Tcp *socket;
 public:
     // Used for threading to create a thread for every taxi
     typedef struct params {
@@ -41,9 +42,9 @@ public:
     int enumFromString(std::string raw, char type);
     // Tokenizes a string and returns the vector
     std::vector<std::string> tokenizeByChar(std::string, char);
-    GameControl();
+    GameControl(Tcp *sock);
     // Parses a driver from input and adds it to the Taxi Dispatcher
-    void addDriver(std::string, char* args[]);
+    void addDriver(std::string);
     // Parses a taxi from input and adds it to the Taxi Dispatcher
     void addTaxi(std::string input);
     // Parses the dimensions of the game, creates the gridmap and obstacles elements

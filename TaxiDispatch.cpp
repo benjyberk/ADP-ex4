@@ -165,7 +165,6 @@ void TaxiDispatch::closingOperations() {
             tcp->sendData("X", database[id]->getSocketNum());
         }
     }
-    delete tcp;
 }
 
 
