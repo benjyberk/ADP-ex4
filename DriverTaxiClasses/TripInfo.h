@@ -9,7 +9,7 @@
 
 #include <stack>
 #include <vector>
-#include "Point.h"
+#include "../MapClasses/Point.h"
 
 class TripInfo {
 private:

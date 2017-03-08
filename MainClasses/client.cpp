@@ -3,14 +3,14 @@
 // Advanced Programming 2016-2017 Bar Ilan
 //
 
-#include "Driver.h"
-#include "Serializer.h"
-#include "StandardTaxi.h"
-#include "LuxuryTaxi.h"
-#include "GameControl.h"
-#include "Socket.h"
-#include "Udp.h"
-#include "Tcp.h"
+#include "../DriverTaxiClasses/Driver.h"
+#include "../GameControlClasses/Serializer.h"
+#include "../DriverTaxiClasses/StandardTaxi.h"
+#include "../DriverTaxiClasses/LuxuryTaxi.h"
+#include "../GameControlClasses/GameControl.h"
+#include "../StructuralClasses/Socket.h"
+#include "../StructuralClasses/Udp.h"
+#include "../StructuralClasses/Tcp.h"
 
 using namespace std;
 
@@ -47,8 +47,10 @@ int main(int argc, char* argv[]) {
 
         // Validate the ints
         if (str1.fail() || convertedInts[i] < 0 || str1.rdbuf()->in_avail() != 0) {
-            return -1;
+            // If anything is invalid, we crash the client
+            return 0;
         }
+        // Clear the stringstream for next round
         str1.clear();
         str1.str("");
     }
@@ -56,7 +58,8 @@ int main(int argc, char* argv[]) {
     // Special error checking for the marital status
     mStatus = (MaritalStatus) gc.enumFromString(tokens[2], 'M');
     if ((int)mStatus == -1) {
-        return -1;
+        // We crash the client
+        return 0;
     }
 
     // Generate the driver object
@@ -93,10 +96,10 @@ int main(int argc, char* argv[]) {
         trip = serial.deserializeTrip(receive);
         taxi->assignTrip(*trip);
 
-        Point a = *taxi->getLocation();
-        Point b = trip->getEndPoint();
+        Point taxiLocation = *taxi->getLocation();
+        Point tripEndPoint = trip->getEndPoint();
         // We loop through this whole trip until we reach the end, or are told to end
-        while (a != b) {
+        while (taxiLocation != tripEndPoint) {
             tcp->reciveData(buffer, sizeof(buffer), 0);
             receive = string(buffer);
 
@@ -110,8 +113,8 @@ int main(int argc, char* argv[]) {
                 break;
             }
 
-            a = *taxi->getLocation();
-            b = trip->getEndPoint();
+            taxiLocation = *taxi->getLocation();
+            tripEndPoint = trip->getEndPoint();
         }
         // We have completed one trip, we free the allocated memory
         delete trip->getRoute();

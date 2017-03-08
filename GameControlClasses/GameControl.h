@@ -8,9 +8,9 @@
 
 
 #include <map>
-#include "TaxiDispatch.h"
-#include "Clock.h"
-#include "ThreadPool.h"
+#include "../DriverTaxiClasses/TaxiDispatch.h"
+#include "../DriverTaxiClasses/Clock.h"
+#include "../StructuralClasses/ThreadPool.h"
 
 /**
  * The Game Control class handles all input and directs the creation
@@ -36,6 +36,7 @@ public:
     typedef struct params2 {
         TaxiDispatch* dispatcher;
         TripInfo * trip;
+        GridMap * map;
     } sendTripParams;
 
     // Converts the input string into the enumeration based on type

@@ -7,7 +7,7 @@
 #define ADVANCED_EX2_DRIVERLOCATIONLISTENER_H
 
 
-#include "Point.h"
+#include "../MapClasses/Point.h"
 
 /**
  * The driver-location-listener class provides a notification when a move event

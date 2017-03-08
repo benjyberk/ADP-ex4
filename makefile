@@ -2,10 +2,10 @@
 all: server client
 
 # Put here all the common files which are being used both in client and server
-COMMON_SOURCES = Driver.cpp Driver.h MaritalStatus.h Color.h Point.cpp Point.h GraphSquare.cpp GraphSquare.h GridMap.cpp GridMap.h findPath.cpp findPath.h TripInfo.cpp TripInfo.h Passenger.cpp Passenger.h Taxi.cpp Taxi.h CarMaker.h StandardTaxi.cpp StandardTaxi.h LuxuryTaxi.cpp LuxuryTaxi.h TaxiDispatch.cpp TaxiDispatch.h DriverLocationListener.cpp DriverLocationListener.h GameControl.cpp GameControl.h DriverTaxiContainer.cpp DriverTaxiContainer.h Serializer.cpp Serializer.h Clock.cpp Clock.h Socket.cpp Socket.h Udp.cpp Udp.h Tcp.cpp Tcp.h
+COMMON_SOURCES = DriverTaxiClasses/Driver.cpp DriverTaxiClasses/Driver.h DriverTaxiClasses/MaritalStatus.h DriverTaxiClasses/Color.h MapClasses/Point.cpp MapClasses/Point.h MapClasses/GraphSquare.cpp MapClasses/GraphSquare.h MapClasses/GridMap.cpp MapClasses/GridMap.h MapClasses/FindPath.cpp MapClasses/FindPath.h DriverTaxiClasses/TripInfo.cpp DriverTaxiClasses/TripInfo.h DriverTaxiClasses/Passenger.cpp DriverTaxiClasses/Passenger.h DriverTaxiClasses/Taxi.cpp DriverTaxiClasses/Taxi.h DriverTaxiClasses/CarMaker.h DriverTaxiClasses/StandardTaxi.cpp DriverTaxiClasses/StandardTaxi.h DriverTaxiClasses/LuxuryTaxi.cpp DriverTaxiClasses/LuxuryTaxi.h DriverTaxiClasses/TaxiDispatch.cpp DriverTaxiClasses/TaxiDispatch.h DriverTaxiClasses/DriverLocationListener.cpp DriverTaxiClasses/DriverLocationListener.h GameControlClasses/GameControl.cpp GameControlClasses/GameControl.h DriverTaxiClasses/DriverTaxiContainer.cpp DriverTaxiClasses/DriverTaxiContainer.h GameControlClasses/Serializer.cpp GameControlClasses/Serializer.h DriverTaxiClasses/Clock.cpp DriverTaxiClasses/Clock.h StructuralClasses/Socket.cpp StructuralClasses/Socket.h StructuralClasses/Udp.cpp StructuralClasses/Udp.h StructuralClasses/Tcp.cpp StructuralClasses/Tcp.h StructuralClasses/ThreadPool.cpp StructuralClasses/ThreadPool.h StructuralClasses/Task.cpp StructuralClasses/Task.h
 
 server:
-	g++ -std=c++0x server.cpp $(COMMON_SOURCES) -I. -o server.out -lpthread
+	g++ -std=c++0x MainClasses/server.cpp $(COMMON_SOURCES) -I. -o server.out -lpthread
 # (for example)
 client:
-	g++ -std=c++0x client.cpp $(COMMON_SOURCES) -I. -o client.out -lpthread
+	g++ -std=c++0x MainClasses/client.cpp $(COMMON_SOURCES) -I. -o client.out -lpthread

@@ -9,7 +9,7 @@
 class Taxi;
 
 #include "Taxi.h"
-#include "Socket.h"
+#include "../StructuralClasses/Socket.h"
 
 /**
  * A container class that holds the driver and the taxi as well as their location

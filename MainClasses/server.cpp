@@ -5,9 +5,9 @@
 
 #include <cstdlib>
 #include <string.h>
-#include "Point.h"
-#include "GridMap.h"
-#include "GameControl.h"
+#include "../MapClasses/Point.h"
+#include "../MapClasses/GridMap.h"
+#include "../GameControlClasses/GameControl.h"
 
 using namespace std;
 

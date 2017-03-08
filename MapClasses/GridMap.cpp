@@ -23,6 +23,7 @@ GridMap::GridMap(int width, int height, vector<Point> inputObstacles) {
             Point* tempPoint = new Point(i, height - j - 1);
             GraphSquare* tempGraphSquare = new GraphSquare(tempPoint);
             tempGraphSquare->distanceFromSource = -1;
+            tempGraphSquare->predecessor = Point(-1,-1);
             grid[i][height - j - 1] = tempGraphSquare;
         }
     }
@@ -56,19 +57,21 @@ vector<GraphSquare *> GridMap::getNeighbours(Point find) {
         adjacent.push_back(grid[xpos][ypos - 1]);
     }
 
+    // For the adjacency list we have made, we check to see that no obstacles are part of it
     for (int i = 0; i < adjacent.size(); i++) {
         int found = 0;
         for (int j = 0; j < obstacles.size(); j++) {
-
-            Point a = *(adjacent[i]->gridLocation);
-            Point b = obstacles[j];
-            if (a == b) {
+            // Check to see if the iTH adjacent point is an obstacle
+            if (*(adjacent[i]->gridLocation) == obstacles[j]) {
                 found = 1;
                 break;
             }
+
         }
+        // If we found a match, we remove it from the list (it is an obstacle and not valid)
         if (found) {
             adjacent.erase(adjacent.begin() + i);
+            i--;
         }
     }
 
@@ -101,6 +104,7 @@ void GridMap::reset() {
     for (int i = 0; i < maxWidth; i++) {
         for (int j = 0; j < maxHeight; j++) {
             grid[i][maxHeight - j - 1]->distanceFromSource = -1;
+            grid[i][maxHeight - j - 1]->predecessor = Point(-1,-1);
             //grid[i][maxHeight - j - 1]->predecessor = 0;
         }
     }
